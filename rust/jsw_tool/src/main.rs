@@ -1,25 +1,14 @@
-use anyhow::{Context, Result};
-use clap::Parser;
-
 // use flexi_logger::colored_default_format;
 // use log::{debug, error, info, warn};
 use std::error::Error;
 
+use clap::Parser;
+use cli::{Cli, Commands};
+
+use jsw_binary_lib::add;
+
+mod cli;
 mod logging;
-
-#[derive(Parser)]
-#[command(version, about, long_about = None)]
-struct Cli {
-    /// Name of the person to greet
-    #[arg(short, long)]
-    name: String,
-
-    /// Number of times to greet
-    #[arg(short, long, default_value_t = 1)]
-    count: u8,
-    // pattern: String,
-    // path: std::path::PathBuf,
-}
 
 fn main() -> Result<(), Box<dyn Error>> {
     // println!("{} {}\n", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
@@ -44,8 +33,17 @@ fn main() -> Result<(), Box<dyn Error>> {
     //     }
     // }
 
-    for _ in 0..args.count {
-        println!("Hello {}!", args.name);
+    // for _ in 0..args.count {
+    //     println!("Hello {}!", args.name);
+    // }
+
+    // You can check for the existence of subcommands, and if found use their
+    // matches just as you would the top level cmd
+    match &args.command {
+        Commands::Convert(args) => {
+            println!("'myapp add' was used, name is: {:?}", args.input);
+            add(2, 2);
+        }
     }
 
     Ok(())

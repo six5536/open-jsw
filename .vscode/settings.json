@@ -32,4 +32,5 @@
   // "prettier.prettierPath": ".yarn/sdks/prettier/index.js"
   // "jest.jestCommandLine": "yarn test"
   "jest.runMode": "on-demand"
+  // "debug.allowBreakpointsEverywhere": true
 }

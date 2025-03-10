@@ -1,0 +1,18 @@
+# [PROJECT_DIR]/Cargo.toml
+[workspace]
+members = ["jsw_tool", "jsw_binary_lib"]
+resolver = "3"                           # Rust 2024 edition
+
+[workspace.package]
+version = "0.1.0"
+edition = "2024"
+authors = ["Richard Sewell"]
+description = "A JSW tool"
+documentation = "https://TODO.com"
+
+[workspace.dependencies]
+anyhow = "1.0.97"
+clap = { version = "4.5.31" }
+flexi_logger = { version = "0.29.8" }
+log = "0.4.26"
+jsw_binary_lib = { path = "jsw_binary_lib" }

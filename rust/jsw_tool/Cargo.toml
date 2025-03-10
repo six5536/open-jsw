@@ -1,0 +1,11 @@
+[package]
+name = "jsw_tool"
+version.workspace = true
+edition.workspace = true
+
+[dependencies]
+anyhow = { workspace = true }
+clap = { workspace = true, features = ["derive"] }
+flexi_logger = { workspace = true, features = ["colors"] }
+log = { workspace = true }
+jsw_binary_lib = { workspace = true }
