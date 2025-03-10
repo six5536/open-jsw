@@ -1,11 +1,12 @@
 // use flexi_logger::colored_default_format;
 // use log::{debug, error, info, warn};
-use std::error::Error;
+use std::{error::Error, fs::File};
 
+use anyhow::Context;
 use clap::Parser;
 use cli::{Cli, Commands};
 
-use jsw_binary_lib::add;
+use jsw_binary_lib::convert;
 
 mod cli;
 mod logging;
@@ -41,8 +42,16 @@ fn main() -> Result<(), Box<dyn Error>> {
     // matches just as you would the top level cmd
     match &args.command {
         Commands::Convert(args) => {
-            println!("'myapp add' was used, name is: {:?}", args.input);
-            add(2, 2);
+            println!("Converting: {:?}", args.input);
+
+            let path = &args.input;
+            let file = File::open(path)
+                .with_context(|| format!("Failed to load conversion input '{:?}'", path))?;
+            let res = convert(file).with_context(|| format!("Failed to convert '{:?}'", path))?;
+            for room in res.rooms {
+                println!("{} - {:?}", room.room_no, room.name);
+            }
+            // println!("{:?}", res.rooms);
         }
     }
 
