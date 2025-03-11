@@ -12,7 +12,7 @@
       "cargo": {
         "args": ["build", "--manifest-path", "${workspaceFolder}/rust/jsw_tool/Cargo.toml"]
       },
-      "args": ["convert", "./resources/mm/bin/mm.bin", "./resources/mm/gameo/"],
+      "args": ["convert", "./resources/mm/bin/mm.bin", "./resources/mm/game/"],
       "sourceLanguages": ["rust"]
     },
     {
@@ -23,7 +23,7 @@
       "cargo": {
         "args": ["build", "--manifest-path", "${workspaceFolder}/rust/jsw_tool/Cargo.toml"]
       },
-      "args": ["convert", "./resources/mm/bin/mm.tap", "./resources/mm/gameo/"],
+      "args": ["convert", "./resources/mm/bin/mm.tap", "./resources/mm/game/"],
       "sourceLanguages": ["rust"]
     },
     {
@@ -34,7 +34,40 @@
       "cargo": {
         "args": ["build", "--manifest-path", "${workspaceFolder}/rust/jsw_tool/Cargo.toml"]
       },
-      "args": ["convert", "./resources/mm/bin/mm.tzx", "./resources/mm/gameo/"],
+      "args": ["convert", "./resources/mm/bin/mm.tzx", "./resources/mm/game/"],
+      "sourceLanguages": ["rust"]
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "jsw_tool (convert, jsw[bin])",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--manifest-path", "${workspaceFolder}/rust/jsw_tool/Cargo.toml"]
+      },
+      "args": ["convert", "./resources/jsw/bin/jsw.bin", "./resources/jsw/game/"],
+      "sourceLanguages": ["rust"]
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "jsw_tool (convert, jsw[tap])",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--manifest-path", "${workspaceFolder}/rust/jsw_tool/Cargo.toml"]
+      },
+      "args": ["convert", "./resources/jsw/bin/jsw.tap", "./resources/jsw/game/"],
+      "sourceLanguages": ["rust"]
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "jsw_tool (convert, jsw[tzx])",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--manifest-path", "${workspaceFolder}/rust/jsw_tool/Cargo.toml"]
+      },
+      "args": ["convert", "./resources/jsw/bin/jsw.tzx", "./resources/jsw/game/"],
       "sourceLanguages": ["rust"]
     },
     {

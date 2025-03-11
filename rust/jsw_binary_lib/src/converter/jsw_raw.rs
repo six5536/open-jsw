@@ -1,19 +1,19 @@
 // use byteorder::{LittleEndian, ReadBytesExt};
+use bytebuffer::ByteBuffer;
+use bytebuffer::Endian::BigEndian;
 use std::{
     fs::File,
     io::{self, Read},
 };
 
-use bytebuffer::ByteBuffer;
-use bytebuffer::Endian::BigEndian;
+use std::path::PathBuf;
 
-use super::jsw_signatures::{self, GameType};
-
-const RAM_OFFSET: usize = 0x8000;
-const ROOMS_OFFSET: usize = 0xb000 - RAM_OFFSET;
-const ROOM_SIZE: usize = 0x400;
-const ROOM_COUNT: u8 = 20;
-const ROOM_NAME_LENGTH: usize = 0x20;
+use super::{
+    jsw_raw_parser::JswGame,
+    jsw_signatures::{self, Game, GameType},
+    jsw2_raw_parser::Jsw2Game,
+    mm_raw_parser::MmGame,
+};
 
 pub struct JswRaw {
     pub rooms: Vec<JswRawRoom>,
@@ -25,71 +25,80 @@ pub struct JswRawRoom {
     // pub item3: i32,
 }
 
-impl JswRaw {
-    pub fn from_reader(mut rdr: impl Read) -> io::Result<Self> {
-        let bytes = &mut vec![];
+pub fn from_file(path: &PathBuf) -> io::Result<JswRaw> {
+    let bytes = &mut vec![];
+    let game = JswRawReader::from_file(path, bytes)?;
+
+    game_buffer_to_game(game)
+}
+
+pub fn from_reader(rdr: impl Read) -> io::Result<JswRaw> {
+    let bytes = &mut vec![];
+    let game = JswRawReader::from_reader(rdr, bytes)?;
+
+    game_buffer_to_game(game)
+}
+
+pub fn from_bytes<'a>(bytes: &'a [u8]) -> io::Result<JswRaw> {
+    let game = JswRawReader::from_bytes(bytes)?;
+
+    game_buffer_to_game(game)
+}
+
+fn game_buffer_to_game<'a>(game: Game<'a>) -> io::Result<JswRaw> {
+    let game_bytes = game.game_bytes();
+
+    let mut data = ByteBuffer::from_bytes(game_bytes);
+    data.set_endian(BigEndian);
+
+    match game.game_type() {
+        GameType::MM => {
+            // gameParser = MmGame();
+            MmGame::extract_game(&mut data)
+        }
+        GameType::JSW => {
+            // gameParser = JswGame();
+            JswGame::extract_game(&mut data)
+        }
+        GameType::JSW2 => {
+            // gameParser = Jsw2Game();
+            Jsw2Game::extract_game(&mut data)
+        }
+    }
+}
+
+struct JswRawReader {}
+
+impl<'a> JswRawReader {
+    fn from_file(path: &PathBuf, bytes: &'a mut Vec<u8>) -> io::Result<Game<'a>> {
+        let file = File::open(path)?;
+
+        Self::from_reader(file, bytes)
+    }
+
+    fn from_reader(mut rdr: impl Read, bytes: &'a mut Vec<u8>) -> io::Result<Game<'a>> {
         rdr.read_to_end(bytes)?;
 
         Self::from_bytes(bytes)
     }
 
-    pub fn from_bytes(bytes: &[u8]) -> io::Result<Self> {
+    fn from_bytes(bytes: &'a [u8]) -> io::Result<Game<'a>> {
         // Identify the game type
         let game = jsw_signatures::identify(bytes)?;
-        let game_bytes = game.game_bytes();
 
-        let mut data = ByteBuffer::from_bytes(game_bytes);
-        data.set_endian(BigEndian);
-
-        let mut rooms = vec![];
-
-        // TODO - work out the file format
-        let mut room_no: u8 = 0;
-        while room_no < ROOM_COUNT {
-            Self::extract_room(&mut data, room_no, &mut rooms)?;
-
-            room_no += 1;
-        } // 33168 - 399 = 32769
-
-        // let roomNo = data.read_u8()?;
-        // // let item2 = rdr.read_u16::<LittleEndian>()?;
-        // let item2 = u16::from_be(rdr.read_u16());
-        // // let item3 = rdr.read_i32::<LittleEndian>()?;
-
-        Ok(JswRaw { rooms })
-    }
-
-    fn extract_room(
-        data: &mut ByteBuffer,
-        room_no: u8,
-        rooms: &mut Vec<JswRawRoom>,
-    ) -> io::Result<()> {
-        let room_offset = ROOMS_OFFSET + (room_no as usize * ROOM_SIZE);
-        data.set_rpos(room_offset);
-
-        // Room name
-        data.set_rpos(room_offset + 0x200);
-        let raw_name = Self::read_string(data, ROOM_NAME_LENGTH)?;
-        let name = raw_name.trim().to_string();
-
-        let room = JswRawRoom { room_no, name };
-        rooms.push(room);
-
-        Ok(())
-    }
-
-    fn read_string(data: &mut ByteBuffer, length: usize) -> io::Result<String> {
-        let s = String::from_utf8(data.read_bytes(length)?)
-            .map_err(|_| io::Error::new(io::ErrorKind::InvalidData, "Invalid UTF-8"))?;
-
-        Ok(s)
+        Ok(game)
     }
 }
 
-// pub fn convert(mut rdr: impl Read) -> io::Result<Configuration> {
-//     println!("Converting...");
+pub trait JswRawParser {
+    fn extract_game(data: &mut ByteBuffer) -> io::Result<JswRaw> {
+        let raw_game = JswRaw {
+            rooms: Self::extract_rooms(data)?,
+        };
 
-//     let file = File::open("/dev/random").unwrap();
+        Ok(raw_game)
+    }
 
-//     let config = Configuration::from_reader(file);
-// }
+    fn extract_rooms(data: &mut ByteBuffer) -> io::Result<Vec<JswRawRoom>>;
+    fn extract_room(data: &mut ByteBuffer, room_no: u8) -> io::Result<JswRawRoom>;
+}

@@ -7,7 +7,7 @@ use std::{
 };
 
 pub fn convert(rdr: impl Read) -> io::Result<JswRaw> {
-    JswRaw::from_reader(rdr)
+    converter::jsw_raw::from_reader(rdr)
     // Err(io::Error::new(io::ErrorKind::Other, "your message here"))
 }
 
