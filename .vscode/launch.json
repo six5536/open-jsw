@@ -7,12 +7,34 @@
     {
       "type": "lldb",
       "request": "launch",
-      "name": "jsw_tool (convert, mm)",
+      "name": "jsw_tool (convert, mm[bin])",
       "cwd": "${workspaceFolder}",
       "cargo": {
         "args": ["build", "--manifest-path", "${workspaceFolder}/rust/jsw_tool/Cargo.toml"]
       },
       "args": ["convert", "./resources/mm/bin/mm.bin", "./resources/mm/gameo/"],
+      "sourceLanguages": ["rust"]
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "jsw_tool (convert, mm[tap])",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--manifest-path", "${workspaceFolder}/rust/jsw_tool/Cargo.toml"]
+      },
+      "args": ["convert", "./resources/mm/bin/mm.tap", "./resources/mm/gameo/"],
+      "sourceLanguages": ["rust"]
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "jsw_tool (convert, mm[tzx])",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--manifest-path", "${workspaceFolder}/rust/jsw_tool/Cargo.toml"]
+      },
+      "args": ["convert", "./resources/mm/bin/mm.tzx", "./resources/mm/gameo/"],
       "sourceLanguages": ["rust"]
     },
     {

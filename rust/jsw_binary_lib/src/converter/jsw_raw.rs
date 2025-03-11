@@ -7,7 +7,10 @@ use std::{
 use bytebuffer::ByteBuffer;
 use bytebuffer::Endian::BigEndian;
 
-const ROOMS_OFFSET: usize = 0xb000;
+use super::jsw_signatures::{self, GameType};
+
+const RAM_OFFSET: usize = 0x8000;
+const ROOMS_OFFSET: usize = 0xb000 - RAM_OFFSET;
 const ROOM_SIZE: usize = 0x400;
 const ROOM_COUNT: u8 = 20;
 const ROOM_NAME_LENGTH: usize = 0x20;
@@ -31,7 +34,11 @@ impl JswRaw {
     }
 
     pub fn from_bytes(bytes: &[u8]) -> io::Result<Self> {
-        let mut data = ByteBuffer::from_bytes(bytes);
+        // Identify the game type
+        let game = jsw_signatures::identify(bytes)?;
+        let game_bytes = game.game_bytes();
+
+        let mut data = ByteBuffer::from_bytes(game_bytes);
         data.set_endian(BigEndian);
 
         let mut rooms = vec![];
@@ -42,7 +49,7 @@ impl JswRaw {
             Self::extract_room(&mut data, room_no, &mut rooms)?;
 
             room_no += 1;
-        }
+        } // 33168 - 399 = 32769
 
         // let roomNo = data.read_u8()?;
         // // let item2 = rdr.read_u16::<LittleEndian>()?;
@@ -62,7 +69,8 @@ impl JswRaw {
 
         // Room name
         data.set_rpos(room_offset + 0x200);
-        let name = Self::read_string(data, ROOM_NAME_LENGTH)?;
+        let raw_name = Self::read_string(data, ROOM_NAME_LENGTH)?;
+        let name = raw_name.trim().to_string();
 
         let room = JswRawRoom { room_no, name };
         rooms.push(room);

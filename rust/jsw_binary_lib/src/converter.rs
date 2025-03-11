@@ -1,6 +1,7 @@
 use thiserror::Error;
 
 pub mod jsw_raw;
+pub mod jsw_signatures;
 
 #[derive(Error, Debug)]
 pub enum ConverterError {

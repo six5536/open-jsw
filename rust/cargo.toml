@@ -17,5 +17,5 @@ clap = "4.5.31"
 flexi_logger = "0.29.8"
 log = "0.4.26"
 jsw_binary_lib = { path = "jsw_binary_lib" }
-byteorder = "1.5.0"
+# byteorder = "1.5.0"
 bytebuffer = "2.3.0"

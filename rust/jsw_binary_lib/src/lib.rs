@@ -1,10 +1,10 @@
+mod converter;
+
 use converter::jsw_raw::JswRaw;
 use std::{
     fmt::Error,
     io::{self, ErrorKind, Read},
 };
-
-mod converter;
 
 pub fn convert(rdr: impl Read) -> io::Result<JswRaw> {
     JswRaw::from_reader(rdr)
