@@ -1,30 +1,22 @@
-use crate::Error;
-use crate::Result;
+use crate::{Error, Result, game::GameType};
 
-#[derive(Debug, Clone)]
-pub enum GameType {
-    MM,
-    JSW,
-    JSW2,
-}
-
-pub fn identify<'a>(bytes: &'a [u8]) -> Result<Game<'a>> {
+pub fn identify_game<'a>(bytes: &'a [u8]) -> Result<RawGameData<'a>> {
     let games = vec![
-        Game::new(
+        RawGameData::new(
             GameType::MM,
             MM_SIGNATURE,
             MM_SIGNATURE_OFFSET,
             MM_GAME_LENGTH,
             bytes,
         ),
-        Game::new(
+        RawGameData::new(
             GameType::JSW,
             JSW_SIGNATURE,
             JSW_SIGNATURE_OFFSET,
             JSW_GAME_LENGTH,
             bytes,
         ),
-        Game::new(
+        RawGameData::new(
             GameType::JSW2,
             JSW2_SIGNATURE,
             JSW2_SIGNATURE_OFFSET,
@@ -45,7 +37,7 @@ pub fn identify<'a>(bytes: &'a [u8]) -> Result<Game<'a>> {
     Err(Error::GameNotRecognised)
 }
 
-pub struct Game<'a> {
+pub struct RawGameData<'a> {
     game_type: GameType,
     valid: bool,
 
@@ -58,7 +50,7 @@ pub struct Game<'a> {
     // Game constants
 }
 
-impl<'a> Game<'a> {
+impl<'a> RawGameData<'a> {
     fn new(
         game_type: GameType,
         signature: &'static [u8],

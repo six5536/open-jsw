@@ -1,8 +1,9 @@
+use std::thread;
+
 use flexi_logger::DeferredNow;
 // use flexi_logger::TS_DASHES_BLANK_COLONS_DOT_BLANK;
 use flexi_logger::style;
 use log::Record;
-use std::thread;
 
 pub fn cli_format(
     w: &mut dyn std::io::Write,

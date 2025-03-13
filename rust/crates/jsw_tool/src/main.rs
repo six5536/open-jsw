@@ -6,7 +6,6 @@ use std::fs::File;
 
 use clap::Parser;
 use cli::{Cli, Commands};
-
 use open_jsw_core::convert;
 
 mod cli;

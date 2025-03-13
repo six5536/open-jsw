@@ -1,22 +1,18 @@
-use crate::Result;
-
 use bytebuffer::ByteBuffer;
 
-use super::super::{
-    converter_utils::{RAM_OFFSET, read_string},
-    jsw_raw::{JswRawParser, JswRawRoom},
-};
+use super::{RAM_OFFSET, RawParser, read_string};
+use crate::{Result, raw_game::JswRawRoom};
 
-const ROOMS_OFFSET: usize = 0x0C000 - RAM_OFFSET;
-const ROOM_SIZE: usize = 0x100;
-const ROOM_COUNT: u8 = 60;
+const ROOMS_OFFSET: usize = 0x0B000 - RAM_OFFSET;
+const ROOM_SIZE: usize = 0x400;
+const ROOM_COUNT: u8 = 20;
 const ROOM_NAME_LENGTH: usize = 0x20;
 
-pub struct JswGame {
+pub struct RawJsw2Game {
     //
 }
 
-impl JswRawParser for JswGame {
+impl RawParser for RawJsw2Game {
     fn extract_rooms(data: &mut ByteBuffer) -> Result<Vec<JswRawRoom>> {
         let mut rooms: Vec<JswRawRoom> = vec![];
 
@@ -37,7 +33,7 @@ impl JswRawParser for JswGame {
         data.set_rpos(room_offset);
 
         // Room name
-        data.set_rpos(room_offset + 0x80);
+        data.set_rpos(room_offset + 0x200);
         let raw_name = read_string(data, ROOM_NAME_LENGTH)?;
         let name = raw_name.trim().to_string();
 

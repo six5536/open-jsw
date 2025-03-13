@@ -1,9 +1,7 @@
-use clap::Args;
-use clap::Parser;
-use clap::Subcommand;
 // use clap::value_parser;
-
 use std::path::PathBuf;
+
+use clap::{Args, Parser, Subcommand};
 
 mod validation;
 use validation::file_exists;
