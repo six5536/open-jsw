@@ -1,13 +1,12 @@
-use anyhow::{Context, Result};
 use clap::Args;
 use clap::Parser;
 use clap::Subcommand;
-use clap::value_parser;
+// use clap::value_parser;
 
 use std::path::PathBuf;
 
 mod validation;
-use validation::{dir_exists, file_exists};
+use validation::file_exists;
 
 #[derive(Parser)]
 #[command(version, about, long_about = None)]

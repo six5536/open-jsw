@@ -1,4 +1,5 @@
-use std::io;
+use crate::Error;
+use crate::Result;
 
 #[derive(Debug, Clone)]
 pub enum GameType {
@@ -7,7 +8,7 @@ pub enum GameType {
     JSW2,
 }
 
-pub fn identify<'a>(bytes: &'a [u8]) -> Result<Game<'a>, std::io::Error> {
+pub fn identify<'a>(bytes: &'a [u8]) -> Result<Game<'a>> {
     let games = vec![
         Game::new(
             GameType::MM,
@@ -40,7 +41,8 @@ pub fn identify<'a>(bytes: &'a [u8]) -> Result<Game<'a>, std::io::Error> {
             return Ok(game);
         }
     }
-    Err(io::Error::new(io::ErrorKind::Other, "Game not recognised"))
+    // Err(io::Error::new(io::ErrorKind::Other, "Game not recognised").into())
+    Err(Error::GameNotRecognised)
 }
 
 pub struct Game<'a> {
@@ -109,8 +111,6 @@ impl<'a> Game<'a> {
         &self.bytes[self.start_index..self.game_length()]
     }
 }
-
-const RAM_OFFSET: usize = 0x8000;
 
 const MM_SIGNATURE: &[u8] = &[
     0x06, 0x10, 0xCB, 0x41, 0x1A, 0x28, 0x04, 0xA6, 0xC0, 0x1A, 0xB6, 0x77, 0x2C, 0x13, 0xCB, 0x41,

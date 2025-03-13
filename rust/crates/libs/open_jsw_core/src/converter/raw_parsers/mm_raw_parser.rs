@@ -1,8 +1,8 @@
-use std::io;
+use crate::Result;
 
 use bytebuffer::ByteBuffer;
 
-use super::{
+use super::super::{
     converter_utils::{RAM_OFFSET, read_string},
     jsw_raw::{JswRawParser, JswRawRoom},
 };
@@ -12,12 +12,12 @@ const ROOM_SIZE: usize = 0x400;
 const ROOM_COUNT: u8 = 20;
 const ROOM_NAME_LENGTH: usize = 0x20;
 
-pub struct Jsw2Game {
+pub struct MmGame {
     //
 }
 
-impl JswRawParser for Jsw2Game {
-    fn extract_rooms(data: &mut ByteBuffer) -> io::Result<Vec<JswRawRoom>> {
+impl JswRawParser for MmGame {
+    fn extract_rooms(data: &mut ByteBuffer) -> Result<Vec<JswRawRoom>> {
         let mut rooms: Vec<JswRawRoom> = vec![];
 
         // TODO - work out the file format
@@ -32,7 +32,7 @@ impl JswRawParser for Jsw2Game {
         Ok(rooms)
     }
 
-    fn extract_room(data: &mut ByteBuffer, room_no: u8) -> io::Result<JswRawRoom> {
+    fn extract_room(data: &mut ByteBuffer, room_no: u8) -> Result<JswRawRoom> {
         let room_offset = ROOMS_OFFSET + (room_no as usize * ROOM_SIZE);
         data.set_rpos(room_offset);
 

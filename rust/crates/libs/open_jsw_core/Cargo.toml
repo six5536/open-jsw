@@ -1,10 +1,12 @@
 [package]
-name = "jsw_binary_lib"
+name = "open_jsw_core"
 version.workspace = true
 edition.workspace = true
 
 [dependencies]
+thiserror = { workspace = true }
 bytebuffer = { workspace = true }
+# derive_more = { workspace = true, features = ["from", "display"] }
 # byteorder = { workspace = true }
 log = { workspace = true }
-thiserror = { workspace = true }
+# thiserror = { workspace = true }

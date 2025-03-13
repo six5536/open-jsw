@@ -1,17 +1,26 @@
-// use flexi_logger::colored_default_format;
-// use log::{debug, error, info, warn};
-use std::{error::Error, fs::File};
+// Import and re-export the `error` module
+pub use self::error::{Error, Result};
+mod error;
 
-use anyhow::Context;
+use std::fs::File;
+
 use clap::Parser;
 use cli::{Cli, Commands};
 
-use jsw_binary_lib::convert;
+use open_jsw_core::convert;
 
 mod cli;
 mod logging;
 
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() -> Result<()> {
+    if let Err(e) = run() {
+        log::error!("{}", e);
+        std::process::exit(1);
+    }
+    Ok(())
+}
+
+fn run() -> Result<()> {
     // println!("{} {}\n", env!("CARGO_PKG_NAME"), env!("CARGO_PKG_VERSION"));
 
     logging::init()?;
@@ -45,9 +54,12 @@ fn main() -> Result<(), Box<dyn Error>> {
             println!("Converting: {:?}", args.input);
 
             let path = &args.input;
-            let file = File::open(path)
-                .with_context(|| format!("Failed to load conversion input '{:?}'", path))?;
-            let res = convert(file).with_context(|| format!("Failed to convert '{:?}'", path))?;
+            // let file = File::open(path)
+            //     .with_context(|| format!("Failed to load conversion input '{:?}'", path))?;
+            // let res = convert(file).with_context(|| format!("Failed to convert '{:?}'", path))?;
+
+            let file = File::open(path)?;
+            let res = convert(file)?;
             for room in res.rooms {
                 println!("{} - {:?}", room.room_no, room.name);
             }

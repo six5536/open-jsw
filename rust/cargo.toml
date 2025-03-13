@@ -1,7 +1,13 @@
 # [PROJECT_DIR]/Cargo.toml
 [workspace]
-members = ["jsw_tool", "jsw_binary_lib"]
-resolver = "3"                           # Rust 2024 edition
+members = [
+  # Applications
+  "crates/jsw_tool",
+
+  # Libraries
+  "crates/libs/open_jsw_core",
+]
+resolver = "3" # Rust 2024 edition
 
 [workspace.package]
 version = "0.1.0"
@@ -11,11 +17,16 @@ description = "A JSW tool"
 documentation = "https://TODO.com"
 
 [workspace.dependencies]
-anyhow = "1.0.97"
+open_jsw_core = { path = "crates/libs/open_jsw_core" }
+# derive_more = { version = "2.0.1", features = ["from"] }
 thiserror = "2.0.12"
 clap = "4.5.31"
 flexi_logger = "0.29.8"
 log = "0.4.26"
-jsw_binary_lib = { path = "jsw_binary_lib" }
 # byteorder = "1.5.0"
 bytebuffer = "2.3.0"
+
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+# unused = { level = "allow", priority = -1 } # For exploratory dev.
