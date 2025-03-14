@@ -38,16 +38,16 @@ impl JswRawGame {
         let bytes = &mut vec![];
         rdr.read_to_end(bytes)?;
 
-        Self::from_bytes(&bytes)
+        Self::from_bytes(bytes)
     }
 
-    pub fn from_bytes<'a>(bytes: &'a [u8]) -> Result<Self> {
+    pub fn from_bytes(bytes: &[u8]) -> Result<Self> {
         let game = raw_game_identifier::identify_game(bytes)?;
 
         Self::game_buffer_to_game(game)
     }
 
-    fn game_buffer_to_game<'a>(game_data: RawGameData<'a>) -> Result<Self> {
+    fn game_buffer_to_game(game_data: RawGameData) -> Result<Self> {
         let game_bytes = game_data.game_bytes();
 
         let mut data = ByteBuffer::from_bytes(game_bytes);

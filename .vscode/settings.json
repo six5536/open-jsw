@@ -31,6 +31,12 @@
   },
   // "prettier.prettierPath": ".yarn/sdks/prettier/index.js"
   // "jest.jestCommandLine": "yarn test"
-  "jest.runMode": "on-demand"
+  "jest.runMode": "on-demand",
+  "rust-analyzer.restartServerOnConfigChange": true,
+  "rust-analyzer.showSyntaxTree": false,
+  "rust-analyzer.testExplorer": true,
+  "rust-analyzer.debug.buildBeforeRestart": true,
+  "rust-analyzer.diagnostics.styleLints.enable": true,
+  "rust-analyzer.check.command": "clippy"
   // "debug.allowBreakpointsEverywhere": true
 }

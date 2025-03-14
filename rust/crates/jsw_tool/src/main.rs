@@ -2,11 +2,9 @@
 pub use self::error::{Error, Result};
 mod error;
 
-use std::fs::File;
-
 use clap::Parser;
 use cli::{Cli, Commands};
-use open_jsw_core::convert;
+use open_jsw_core::raw_game::JswRawGame;
 
 mod cli;
 mod logging;
@@ -57,8 +55,7 @@ fn run() -> Result<()> {
             //     .with_context(|| format!("Failed to load conversion input '{:?}'", path))?;
             // let res = convert(file).with_context(|| format!("Failed to convert '{:?}'", path))?;
 
-            let file = File::open(path)?;
-            let res = convert(file)?;
+            let res = JswRawGame::from_file(path)?;
             for room in res.rooms {
                 println!("{} - {:?}", room.room_no, room.name);
             }

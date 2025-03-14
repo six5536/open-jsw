@@ -1,6 +1,6 @@
 use crate::{Error, Result, game::GameType};
 
-pub fn identify_game<'a>(bytes: &'a [u8]) -> Result<RawGameData<'a>> {
+pub fn identify_game(bytes: &[u8]) -> Result<RawGameData> {
     let games = vec![
         RawGameData::new(
             GameType::MM,
