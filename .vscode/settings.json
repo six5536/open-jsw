@@ -32,11 +32,16 @@
   // "prettier.prettierPath": ".yarn/sdks/prettier/index.js"
   // "jest.jestCommandLine": "yarn test"
   "jest.runMode": "on-demand",
+  "mise.configureExtensionsUseSymLinks": true,
   "rust-analyzer.restartServerOnConfigChange": true,
   "rust-analyzer.showSyntaxTree": false,
   "rust-analyzer.testExplorer": true,
   "rust-analyzer.debug.buildBeforeRestart": true,
   "rust-analyzer.diagnostics.styleLints.enable": true,
-  "rust-analyzer.check.command": "clippy"
+  "rust-analyzer.check.command": "clippy",
+  "debug.javascript.defaultRuntimeExecutable": {
+    "pwa-node": "${workspaceFolder}/.vscode/mise-tools/node"
+  },
+  "python.defaultInterpreterPath": "${workspaceFolder}/.vscode/mise-tools/python"
   // "debug.allowBreakpointsEverywhere": true
 }

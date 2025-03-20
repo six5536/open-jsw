@@ -1,7 +1,11 @@
 [package]
 name = "jsw_tool"
+description = "JSW Tool"
 version.workspace = true
+authors.workspace = true
+documentation.workspace = true
 edition.workspace = true
+rust-version.workspace = true
 
 [dependencies]
 open_jsw_core = { workspace = true }

@@ -1,7 +1,11 @@
 [package]
 name = "open_jsw_core"
+description = "Open JSW Core"
 version.workspace = true
+authors.workspace = true
+documentation.workspace = true
 edition.workspace = true
+rust-version.workspace = true
 
 [dependencies]
 thiserror = { workspace = true }

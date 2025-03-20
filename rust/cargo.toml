@@ -1,30 +1,43 @@
 # [PROJECT_DIR]/Cargo.toml
 [workspace]
+resolver = "3" # Rust 2024 edition
 members = [
   # Applications
-  "crates/jsw_tool",
+  "apps/open_jsw",
+  "apps/jsw_tool",
 
   # Libraries
-  "crates/libs/open_jsw_core",
+  "libs/open_jsw_core",
 ]
-resolver = "3" # Rust 2024 edition
+
+default-members = [
+  # Applications
+  "apps/open_jsw",
+  "apps/jsw_tool",
+
+  # Libraries
+  "libs/open_jsw_core",
+]
+
 
 [workspace.package]
 version = "0.1.0"
-edition = "2024"
 authors = ["Richard Sewell"]
 description = "A JSW tool"
 documentation = "https://TODO.com"
+edition = "2024"
+rust-version = "1.85.0"
 
 [workspace.dependencies]
-open_jsw_core = { path = "crates/libs/open_jsw_core" }
-# derive_more = { version = "2.0.1", features = ["from"] }
-thiserror = "2.0.12"
-clap = "4.5.31"
-flexi_logger = "0.29.8"
-log = "0.4.26"
-# byteorder = "1.5.0"
-bytebuffer = "2.3.0"
+open_jsw_core = { path = "libs/open_jsw_core" }
+# derive_more = { version = "2", features = ["from"] }
+thiserror = "2"
+clap = "4"
+flexi_logger = "0"
+log = "0"
+# byteorder = "1"
+bytebuffer = "2"
+macroquad = "0"
 
 
 [workspace.lints.rust]

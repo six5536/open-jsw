@@ -1,0 +1,13 @@
+[package]
+name = "open_jsw"
+description = "Open JSW"
+version.workspace = true
+authors.workspace = true
+documentation.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+# thiserror = { workspace = true }
+# derive_more = { workspace = true, features = ["from"] }
+macroquad.workspace = true
