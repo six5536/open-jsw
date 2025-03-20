@@ -11,3 +11,12 @@ rust-version.workspace = true
 # thiserror = { workspace = true }
 # derive_more = { workspace = true, features = ["from"] }
 macroquad.workspace = true
+macroquad-profiler.workspace = true
+
+
+# sapp-jsutils
+#
+# Tools to get data in and out of WASM.
+#
+# https://github.com/not-fl3/sapp-jsutils/tree/master
+# https://github.com/not-fl3/miniquad-js-interop-demo

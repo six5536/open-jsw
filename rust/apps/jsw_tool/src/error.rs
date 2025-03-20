@@ -18,6 +18,9 @@ pub enum Error {
     #[error("OpenJswCore: {}", .0)]
     OpenJswCore(#[from] open_jsw_core::Error),
 
+    #[error("OpenJswTiled: {}", .0)]
+    OpenJswTiled(#[from] open_jsw_tiled::Error),
+
     #[error("IO::{:?}: {}", .0, .0)]
     Io(#[from] std::io::Error),
 

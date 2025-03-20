@@ -9,6 +9,7 @@ rust-version.workspace = true
 
 [dependencies]
 open_jsw_core = { workspace = true }
+open_jsw_tiled = { workspace = true }
 thiserror = { workspace = true }
 # derive_more = { workspace = true, features = ["from"] }
 flexi_logger = { workspace = true, features = ["colors"] }

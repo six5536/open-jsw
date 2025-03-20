@@ -350,6 +350,7 @@ dependencies = [
  "flexi_logger",
  "log",
  "open_jsw_core",
+ "open_jsw_tiled",
  "thiserror",
 ]
 
@@ -378,6 +379,15 @@ dependencies = [
  "miniquad",
  "quad-rand",
  "slotmap",
+]
+
+[[package]]
+name = "macroquad-profiler"
+version = "0.2.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7a0f3792c62d2a730a25ca837bbbdfadc7df4a54033533b9a12489f809f325e5"
+dependencies = [
+ "macroquad",
 ]
 
 [[package]]
@@ -424,6 +434,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "nanoserde"
+version = "0.2.0-beta.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "ded0298c4eb446523600e4d321834a5a80df610155141d20f181bb92bd784fb1"
+dependencies = [
+ "nanoserde-derive",
+]
+
+[[package]]
+name = "nanoserde-derive"
+version = "0.2.0-beta.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6da7f91479ba914a1b94a9b16479910adf24889f4162baebf1015b58b086ab43"
+
+[[package]]
 name = "ndk-sys"
 version = "0.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -467,6 +492,7 @@ name = "open_jsw"
 version = "0.1.0"
 dependencies = [
  "macroquad",
+ "macroquad-profiler",
 ]
 
 [[package]]
@@ -475,6 +501,15 @@ version = "0.1.0"
 dependencies = [
  "bytebuffer",
  "log",
+ "open_jsw_tiled",
+ "thiserror",
+]
+
+[[package]]
+name = "open_jsw_tiled"
+version = "0.1.0"
+dependencies = [
+ "nanoserde",
  "thiserror",
 ]
 
@@ -723,9 +758,9 @@ dependencies = [
 
 [[package]]
 name = "windows-link"
-version = "0.1.0"
+version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6dccfd733ce2b1753b03b6d3c65edf020262ea35e20ccdf3e288043e6dd620e3"
+checksum = "76840935b766e1b0a05c0066835fb9ec80071d4c09a16f6bd5f7e655e3c14c38"
 
 [[package]]
 name = "windows-sys"

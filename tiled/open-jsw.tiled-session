@@ -1,0 +1,23 @@
+{
+    "Map/SizeTest": {
+        "height": 4300,
+        "width": 2
+    },
+    "activeFile": "",
+    "expandedProjectPaths": [
+    ],
+    "file.lastUsedOpenFilter": "All Files (*)",
+    "fileStates": {
+    },
+    "last.imagePath": "/Users/rich/dev/six5536/git/open-jsw/tiled",
+    "map.height": 24,
+    "map.lastUsedFormat": "json",
+    "map.renderOrder": "3",
+    "map.width": 32,
+    "openFiles": [
+    ],
+    "project": "open-jsw.tiled-project",
+    "recentFiles": [
+    ],
+    "tileset.embedInMap": true
+}

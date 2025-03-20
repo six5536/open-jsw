@@ -8,6 +8,7 @@ members = [
 
   # Libraries
   "libs/open_jsw_core",
+  "libs/open_jsw_tiled",
 ]
 
 default-members = [
@@ -17,6 +18,7 @@ default-members = [
 
   # Libraries
   "libs/open_jsw_core",
+  "libs/open_jsw_tiled",
 ]
 
 
@@ -30,14 +32,17 @@ rust-version = "1.85.0"
 
 [workspace.dependencies]
 open_jsw_core = { path = "libs/open_jsw_core" }
+open_jsw_tiled = { path = "libs/open_jsw_tiled" }
 # derive_more = { version = "2", features = ["from"] }
-thiserror = "2"
-clap = "4"
-flexi_logger = "0"
-log = "0"
-# byteorder = "1"
-bytebuffer = "2"
-macroquad = "0"
+thiserror = "2.0"
+clap = "4.5"
+flexi_logger = "0.29"
+log = "0.4"
+# byteorder = "1.5"
+bytebuffer = "2.3"
+macroquad = "0.4"
+macroquad-profiler = "0.2"
+nanoserde = { version = "0.2.0-beta.0", default-features = false }
 
 
 [workspace.lints.rust]

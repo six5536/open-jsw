@@ -1,3 +1,5 @@
+use std::fs::{self};
+
 // Import and re-export the `error` module
 pub use self::error::{Error, Result};
 mod error;
@@ -60,6 +62,23 @@ fn run() -> Result<()> {
                 println!("{} - {:?}", room.room_no, room.name);
             }
             // println!("{:?}", res.rooms);
+        }
+        Commands::ReadMap(args) => {
+            println!("Reading Tiled map: {:?}", args.input);
+
+            let path = &args.input;
+            // let file = File::open(path)
+            //     .with_context(|| format!("Failed to load conversion input '{:?}'", path))?;
+            // let res = convert(file).with_context(|| format!("Failed to convert '{:?}'", path))?;
+
+            // let file = File::open(path)?;
+            let data = fs::read_to_string(path)?;
+
+            let res = open_jsw_tiled::load_map(&data)?;
+            // for room in res.rooms {
+            //     println!("{} - {:?}", room.room_no, room.name);
+            // }
+            println!("{:?}", res);
         }
     }
 

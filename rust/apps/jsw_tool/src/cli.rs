@@ -27,10 +27,25 @@ pub struct Cli {
 pub enum Commands {
     /// Convert an original game file to OpenJSW format
     Convert(ConvertArgs),
+
+    ///  Read a Tiled map
+    ReadMap(ConvertArgs),
 }
 
 #[derive(Args)]
 pub struct ConvertArgs {
+    /// Path to original binary game
+    #[arg(value_parser = file_exists)]
+    pub input: PathBuf,
+
+    /// Output directory
+    // #[arg(value_parser = dir_exists)]
+    pub output: Option<PathBuf>,
+    // output: Option<String>,
+}
+
+#[derive(Args)]
+pub struct ReadMapArgs {
     /// Path to original binary game
     #[arg(value_parser = file_exists)]
     pub input: PathBuf,

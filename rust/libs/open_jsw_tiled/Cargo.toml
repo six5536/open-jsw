@@ -1,6 +1,6 @@
 [package]
-name = "open_jsw_core"
-description = "Open JSW Core"
+name = "open_jsw_tiled"
+description = "Open JSW Tiled Library"
 version.workspace = true
 authors.workspace = true
 documentation.workspace = true
@@ -8,10 +8,12 @@ edition.workspace = true
 rust-version.workspace = true
 
 [dependencies]
-open_jsw_tiled = { workspace = true }
 thiserror = { workspace = true }
-bytebuffer = { workspace = true }
+nanoserde = { workspace = true, default-features = false, features = [
+  "std",
+  "json",
+] }
+# bytebuffer = { workspace = true }
 # derive_more = { workspace = true, features = ["from", "display"] }
 # byteorder = { workspace = true }
-log = { workspace = true }
-# thiserror = { workspace = true }
+# log = { workspace = true }
