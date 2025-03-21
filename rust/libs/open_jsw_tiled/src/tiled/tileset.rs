@@ -1,12 +1,12 @@
 #![allow(clippy::question_mark)]
 
-use nanoserde::DeJson;
+use nanoserde::{DeJson, SerJson};
 
-use super::{layer::Layer, property::Property};
+use super::{TILE_VERSION, layer::Layer, property::Property};
 
 /// https://doc.mapeditor.org/en/stable/reference/tmx-map-format/#tmx-tileset
 /// Represents a Tileset in the map.
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 #[nserde(default)]
 pub struct Tileset {
     /// Hex-formatted color (#RRGGBB or #AARRGGBB) (optional).
@@ -16,28 +16,28 @@ pub struct Tileset {
     pub class: Option<String>,
 
     /// The number of tile columns in the tileset.
-    pub columns: i32,
+    pub columns: u32,
 
     /// The fill mode to use when rendering tiles from this tileset: "stretch" (default) or "preserve-aspect-fit" (since 1.9).
-    pub fillmode: Option<FillMode>,
+    pub fillmode: FillMode,
 
     /// GID corresponding to the first tile in the set.
-    pub firstgid: i32,
+    pub firstgid: u32,
 
     /// Grid information (optional).
     pub grid: Option<Grid>,
 
     /// Image used for tiles in this set.
-    pub image: Option<String>,
+    pub image: String,
 
     /// Height of the source image in pixels.
-    pub imageheight: Option<i32>,
+    pub imageheight: u32,
 
     /// Width of the source image in pixels.
-    pub imagewidth: Option<i32>,
+    pub imagewidth: u32,
 
     /// Buffer between the image edge and the first tile (in pixels).
-    pub margin: i32,
+    pub margin: u32,
 
     /// Name given to this tileset.
     pub name: String,
@@ -53,19 +53,19 @@ pub struct Tileset {
     pub source: Option<String>,
 
     /// Spacing between adjacent tiles in the image (in pixels).
-    pub spacing: i32,
+    pub spacing: u32,
 
     /// Array of terrains (optional).
     pub terrains: Option<Vec<Terrain>>,
 
     /// The number of tiles in this tileset.
-    pub tilecount: i32,
+    pub tilecount: u32,
 
     /// The Tiled version used to save the file.
     pub tiledversion: String,
 
     /// Maximum height of tiles in this set.
-    pub tileheight: i32,
+    pub tileheight: u32,
 
     /// Tile offset (optional).
     pub tileoffset: Option<TileOffset>,
@@ -78,7 +78,7 @@ pub struct Tileset {
     pub tiles: Option<Vec<Tile>>,
 
     /// Maximum width of tiles in this set.
-    pub tilewidth: i32,
+    pub tilewidth: u32,
 
     /// Allowed transformations (optional).
     pub transformations: Option<Transformations>,
@@ -98,20 +98,20 @@ pub struct Tileset {
 }
 
 /// Represents grid information in the tileset.
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 pub struct Grid {
     /// Cell height of the tile grid.
-    pub height: i32,
+    pub height: u32,
 
     /// Grid orientation: "orthogonal" (default) or "isometric".
     pub orientation: GridOrientation,
 
     /// Cell width of the tile grid.
-    pub width: i32,
+    pub width: u32,
 }
 
 /// Represents tile offset information.
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 pub struct TileOffset {
     /// Horizontal offset in pixels.
     pub x: i32,
@@ -121,7 +121,7 @@ pub struct TileOffset {
 }
 
 /// Represents allowed transformations in a tileset.
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 pub struct Transformations {
     /// Whether tiles can be flipped horizontally.
     pub hflip: bool,
@@ -137,23 +137,23 @@ pub struct Transformations {
 }
 
 /// Represents a tile in the tileset.
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 #[nserde(default)]
 pub struct Tile {
     /// Array of frames for tile animation (optional).
     pub animation: Option<Vec<Frame>>,
 
     /// Local ID of the tile.
-    pub id: i32,
+    pub id: u32,
 
     /// Image representing this tile (optional, used for image collection tilesets).
     pub image: Option<String>,
 
     /// Height of the tile image in pixels.
-    pub imageheight: Option<i32>,
+    pub imageheight: Option<u32>,
 
     /// Width of the tile image in pixels.
-    pub imagewidth: Option<i32>,
+    pub imagewidth: Option<u32>,
 
     /// The X position of the sub-rectangle representing this tile (default: 0).
     pub x: Option<i32>,
@@ -162,10 +162,10 @@ pub struct Tile {
     pub y: Option<i32>,
 
     /// The width of the sub-rectangle representing this tile (defaults to the image width).
-    pub width: Option<i32>,
+    pub width: Option<u32>,
 
     /// The height of the sub-rectangle representing this tile (defaults to the image height).
-    pub height: Option<i32>,
+    pub height: Option<u32>,
 
     /// Layer with type `objectgroup`, when collision shapes are specified (optional).
     pub objectgroup: Option<Layer>,
@@ -186,17 +186,17 @@ pub struct Tile {
 }
 
 /// Represents a Frame in an animated tile.
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 pub struct Frame {
     /// Local tile ID representing a frame.
-    pub tileid: i32,
+    pub tileid: u32,
 
     /// Duration in milliseconds for this frame.
-    pub duration: i32,
+    pub duration: u32,
 }
 
 /// Represents a Terrain in a Tileset.
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 pub struct Terrain {
     /// Name of the terrain.
     pub name: String,
@@ -205,11 +205,11 @@ pub struct Terrain {
     pub properties: Option<Vec<Property>>,
 
     /// Local ID of the tile representing this terrain.
-    pub tile: i32,
+    pub tile: u32,
 }
 
 /// Represents a Wang set in the tileset.
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 pub struct WangSet {
     /// The class of the Wang set (since 1.9, optional).
     pub class: Option<String>,
@@ -224,7 +224,7 @@ pub struct WangSet {
     pub properties: Option<Vec<Property>>,
 
     /// Local ID of the tile representing the Wang set.
-    pub tile: i32,
+    pub tile: u32,
 
     /// Type of Wang set: "corner", "edge", or "mixed" (since 1.5).
     #[nserde(rename = "type")]
@@ -235,7 +235,7 @@ pub struct WangSet {
 }
 
 /// Represents a Wang Color in a Wang Set.
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 pub struct WangColor {
     /// The class of the Wang color (since 1.9, optional).
     pub class: Option<String>,
@@ -253,20 +253,20 @@ pub struct WangColor {
     pub properties: Option<Vec<Property>>,
 
     /// Local ID of the tile representing the Wang color.
-    pub tile: i32,
+    pub tile: u32,
 }
 
 /// Represents a Wang Tile in a Wang Set.
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 pub struct WangTile {
     /// Local ID of the tile.
-    pub tileid: i32,
+    pub tileid: u32,
 
     /// Array of Wang color indexes (8-bit unsigned integers).
     pub wangid: [u8; 8],
 }
 
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 pub enum FillMode {
     #[default]
     #[nserde(rename = "stretch")]
@@ -275,7 +275,7 @@ pub enum FillMode {
     PreserveAspectFit,
 }
 
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 pub enum ObjectAlignment {
     #[default]
     #[nserde(rename = "unspecified")]
@@ -300,7 +300,7 @@ pub enum ObjectAlignment {
     BottomRight,
 }
 
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 pub enum TileRenderSize {
     #[default]
     #[nserde(rename = "tile")]
@@ -309,14 +309,14 @@ pub enum TileRenderSize {
     Grid,
 }
 
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 pub enum TilesetType {
     #[default]
     #[nserde(rename = "tileset")]
     Tileset,
 }
 
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 pub enum GridOrientation {
     #[default]
     #[nserde(rename = "orthogonal")]
@@ -325,7 +325,7 @@ pub enum GridOrientation {
     Isometric,
 }
 
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 pub enum WangSetType {
     #[default]
     #[nserde(rename = "corner")]
@@ -334,4 +334,39 @@ pub enum WangSetType {
     Edge,
     #[nserde(rename = "mixed")]
     Mixed,
+}
+
+impl Tileset {
+    pub fn new(
+        name: String,
+        image: String,
+        imagewidth: u32,
+        imageheight: u32,
+        tilewidth: u32,
+        tileheight: u32,
+        firstgid: u32,
+    ) -> Self {
+        let columns = imagewidth / tilewidth;
+        let rows = imageheight / tileheight;
+        let tilecount = columns * rows;
+
+        let mut firstgid = firstgid;
+        if firstgid < 1 {
+            firstgid = 1;
+        }
+
+        Self {
+            version: TILE_VERSION.to_string(),
+            name,
+            image,
+            imagewidth,
+            imageheight,
+            columns,
+            tilewidth,
+            tileheight,
+            tilecount,
+            firstgid,
+            ..Default::default()
+        }
+    }
 }

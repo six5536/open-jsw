@@ -3,22 +3,24 @@
 resolver = "3" # Rust 2024 edition
 members = [
   # Applications
-  "apps/open_jsw",
-  "apps/jsw_tool",
+  "rust/apps/open_jsw",
+  "rust/apps/jsw_tool",
 
   # Libraries
-  "libs/open_jsw_core",
-  "libs/open_jsw_tiled",
+  "rust/libs/open_jsw_core",
+  "rust/libs/open_jsw_tiled",
+  "rust/libs/rust_utils",
 ]
 
 default-members = [
   # Applications
-  "apps/open_jsw",
-  "apps/jsw_tool",
+  "rust/apps/open_jsw",
+  "rust/apps/jsw_tool",
 
   # Libraries
-  "libs/open_jsw_core",
-  "libs/open_jsw_tiled",
+  "rust/libs/open_jsw_core",
+  "rust/libs/open_jsw_tiled",
+  "rust/libs/rust_utils",
 ]
 
 
@@ -31,8 +33,10 @@ edition = "2024"
 rust-version = "1.85.0"
 
 [workspace.dependencies]
-open_jsw_core = { path = "libs/open_jsw_core" }
-open_jsw_tiled = { path = "libs/open_jsw_tiled" }
+open_jsw_core = { path = "rust/libs/open_jsw_core" }
+open_jsw_tiled = { path = "rust/libs/open_jsw_tiled" }
+rust_utils = { path = "rust/libs/rust_utils" }
+
 # derive_more = { version = "2", features = ["from"] }
 thiserror = "2.0"
 clap = "4.5"

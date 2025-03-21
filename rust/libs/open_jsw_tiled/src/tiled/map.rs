@@ -1,12 +1,14 @@
 #![allow(clippy::question_mark)]
 
-use nanoserde::DeJson;
+use nanoserde::{DeJson, SerJson};
 
-use super::{layer::Layer, property::Property, tileset::Tileset};
+use super::{MAP_VERSION, TILED_VERSION, layer::Layer, property::Property, tileset::Tileset};
+
+const DEFAULT_MINUS_ONE_I32: i32 = -1;
 
 /// https://doc.mapeditor.org/en/stable/reference/json-map-format/#map
 /// Represents a Map in the Tiled map editor.
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 #[nserde(default)]
 pub struct Map {
     /// Hex-formatted color (#RRGGBB or #AARRGGBB) (optional).
@@ -16,10 +18,11 @@ pub struct Map {
     pub class: Option<String>,
 
     /// The compression level to use for tile layer data (defaults to -1, which means to use the algorithm default).
+    #[nserde(default = "DEFAULT_MINUS_ONE_I32")]
     pub compressionlevel: i32,
 
     /// Number of tile rows.
-    pub height: i32,
+    pub height: u32,
 
     /// Length of the side of a hex tile in pixels (hexagonal maps only).
     pub hexsidelength: Option<i32>,
@@ -31,13 +34,13 @@ pub struct Map {
     pub layers: Vec<Layer>,
 
     /// Auto-increments for each layer.
-    pub nextlayerid: i32,
+    pub nextlayerid: u32,
 
     /// Auto-increments for each placed object.
-    pub nextobjectid: i32,
+    pub nextobjectid: u32,
 
     /// Map orientation: "orthogonal", "isometric", "staggered", or "hexagonal".
-    pub orientation: Orientation,
+    pub orientation: MapOrientation,
 
     /// X coordinate of the parallax origin in pixels (since 1.8, default: 0).
     pub parallaxoriginx: f64,
@@ -62,13 +65,13 @@ pub struct Map {
     pub tiledversion: String,
 
     /// Map grid tile height.
-    pub tileheight: i32,
+    pub tileheight: u32,
 
     /// Array of tilesets.
     pub tilesets: Vec<Tileset>,
 
     /// Map grid tile width.
-    pub tilewidth: i32,
+    pub tilewidth: u32,
 
     /// Type of the map (always "map" since 1.0).
     #[nserde(rename = "type")]
@@ -78,18 +81,18 @@ pub struct Map {
     pub version: String,
 
     /// Number of tile columns.
-    pub width: i32,
+    pub width: u32,
 }
 
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 pub enum MapType {
     #[default]
     #[nserde(rename = "map")]
     Map,
 }
 
-#[derive(Clone, Debug, Default, DeJson)]
-pub enum Orientation {
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
+pub enum MapOrientation {
     #[default]
     #[nserde(rename = "orthogonal")]
     Orthogonal,
@@ -101,7 +104,7 @@ pub enum Orientation {
     Hexagonal,
 }
 
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 pub enum RenderOrder {
     #[default]
     #[nserde(rename = "right-down")]
@@ -114,7 +117,7 @@ pub enum RenderOrder {
     LeftUp,
 }
 
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 pub enum Axis {
     #[default]
     #[nserde(rename = "x")]
@@ -125,11 +128,49 @@ pub enum Axis {
     Z,
 }
 
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 pub enum Parity {
     #[default]
     #[nserde(rename = "odd")]
     Odd,
     #[nserde(rename = "even")]
     Even,
+}
+
+impl Map {
+    pub fn new(
+        class: Option<String>,
+        orientation: MapOrientation,
+        width: u32,
+        height: u32,
+        tilewidth: u32,
+        tileheight: u32,
+    ) -> Self {
+        Self {
+            tiledversion: TILED_VERSION.to_string(),
+            version: MAP_VERSION.to_string(),
+            class,
+            orientation,
+            width,
+            height,
+            tilewidth,
+            tileheight,
+            compressionlevel: -1,
+            nextlayerid: 1,
+            nextobjectid: 1,
+            ..Default::default()
+        }
+    }
+
+    pub fn next_layer_id(&mut self) -> u32 {
+        let id = self.nextlayerid;
+        self.nextlayerid += 1;
+        id
+    }
+
+    pub fn next_object_id(&mut self) -> u32 {
+        let id = self.nextobjectid;
+        self.nextobjectid += 1;
+        id
+    }
 }

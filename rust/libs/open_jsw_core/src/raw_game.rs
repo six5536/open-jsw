@@ -12,6 +12,10 @@ use crate::{Result, game::GameType};
 mod raw_game_identifier;
 mod raw_parser;
 
+pub const ROOM_LAYOUT_WIDTH: usize = 32;
+pub const ROOM_LAYOUT_HEIGHT: usize = 16;
+pub const ROOM_LAYOUT_SIZE: usize = ROOM_LAYOUT_WIDTH * ROOM_LAYOUT_HEIGHT;
+
 pub struct JswRawGame {
     pub game_type: GameType,
     pub rooms: Vec<JswRawRoom>,
@@ -20,6 +24,7 @@ pub struct JswRawGame {
 pub struct JswRawRoom {
     pub room_no: u8,
     pub name: String,
+    pub layout: [u8; ROOM_LAYOUT_SIZE],
 }
 
 impl JswRawGame {

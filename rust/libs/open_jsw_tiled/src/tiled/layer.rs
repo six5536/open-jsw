@@ -1,10 +1,10 @@
 #![allow(clippy::question_mark)]
 
-use super::{chunk::Chunk, object::Object, property::Property};
-use nanoserde::DeJson;
+use super::{chunk::Chunk, layer_data::TileMatrix, map::Map, object::Object, property::Property};
+use nanoserde::{DeJson, SerJson};
 
 /// Represents a Layer in the map.
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 #[nserde(default)]
 pub struct Layer {
     /// Array of chunks (optional, tilelayer only).
@@ -27,19 +27,19 @@ pub struct Layer {
     pub encoding: Option<LayerEncoding>,
 
     /// Row count, same as map height for fixed-size maps (tilelayer only).
-    pub height: Option<i32>,
+    pub height: Option<u32>,
 
     /// Unique incremental ID across all layers.
-    pub id: i32,
+    pub id: u32,
 
     /// Image used by this layer (imagelayer only).
     pub image: Option<String>,
 
     /// Height of the image used by this layer (imagelayer only, since 1.11.1).
-    pub imageheight: Option<i32>,
+    pub imageheight: Option<u32>,
 
     /// Width of the image used by this layer (imagelayer only, since 1.11.1).
-    pub imagewidth: Option<i32>,
+    pub imagewidth: Option<u32>,
 
     /// Array of sub-layers (group only).
     pub layers: Option<Vec<Layer>>,
@@ -99,7 +99,7 @@ pub struct Layer {
     pub visible: bool,
 
     /// Column count, same as map width for fixed-size maps (tilelayer only).
-    pub width: Option<i32>,
+    pub width: Option<u32>,
 
     /// Horizontal layer offset in tiles (always 0).
     pub x: i32,
@@ -108,422 +108,7 @@ pub struct Layer {
     pub y: i32,
 }
 
-// /// Represents a Layer in the map.
-// #[derive(Clone, Debug, DeJson)]
-// #[nserde(default)]
-// #[nserde(tag = "type")]
-// pub enum Layer {
-//     #[nserde(rename = "tilelayer")]
-//     TileLayer {
-//         /// Array of chunks (optional, tilelayer only).
-//         chunks: Option<Vec<Chunk>>,
-
-//         /// The class of the layer (since 1.9, optional).
-//         class: Option<String>,
-
-//         /// Compression type: "zlib", "gzip", "zstd" (since 1.3), or empty (default, tilelayer only).
-//         compression: Option<Compression>,
-
-//         /// Array of unsigned int (GIDs) or base64-encoded data (tilelayer only).
-//         // data: Option<Data>,
-//         data: Option<Vec<u32>>,
-
-//         /// Draw order: "topdown" (default) or "index" (objectgroup only).
-//         draworder: Option<DrawOrder>,
-
-//         /// Encoding type: "csv" (default) or "base64" (tilelayer only).
-//         encoding: Option<LayerEncoding>,
-
-//         /// Row count, same as map height for fixed-size maps (tilelayer only).
-//         height: Option<i32>,
-
-//         /// Unique incremental ID across all layers.
-//         id: i32,
-
-//         /// Image used by this layer (imagelayer only).
-//         image: Option<String>,
-
-//         /// Height of the image used by this layer (imagelayer only, since 1.11.1).
-//         imageheight: Option<i32>,
-
-//         /// Width of the image used by this layer (imagelayer only, since 1.11.1).
-//         imagewidth: Option<i32>,
-
-//         /// Array of sub-layers (group only).
-//         layers: Option<Vec<Layer>>,
-
-//         /// Whether the layer is locked in the editor (default: false, since 1.8.2).
-//         #[nserde(default)]
-//         locked: bool,
-
-//         /// Name assigned to this layer.
-//         name: String,
-
-//         /// Array of objects (objectgroup only).
-//         #[nserde(default)]
-//         objects: Option<Vec<Object>>,
-
-//         /// Horizontal layer offset in pixels (default: 0).
-//         offsetx: f64,
-
-//         /// Vertical layer offset in pixels (default: 0).
-//         offsety: f64,
-
-//         /// Opacity value between 0 and 1.
-//         opacity: f64,
-
-//         /// Horizontal parallax factor for this layer (default: 1, since 1.5).
-//         parallaxx: f64,
-
-//         /// Vertical parallax factor for this layer (default: 1, since 1.5).
-//         parallaxy: f64,
-
-//         /// Array of properties (optional).
-//         properties: Option<Vec<Property>>,
-
-//         /// Whether the image drawn by this layer is repeated along the X axis (imagelayer only, since 1.8).
-//         repeatx: Option<bool>,
-
-//         /// Whether the image drawn by this layer is repeated along the Y axis (imagelayer only, since 1.8).
-//         repeaty: Option<bool>,
-
-//         /// X coordinate where layer content starts (for infinite maps).
-//         startx: Option<i32>,
-
-//         /// Y coordinate where layer content starts (for infinite maps).
-//         starty: Option<i32>,
-
-//         /// Hex-formatted tint color (#RRGGBB or #AARRGGBB) that is multiplied with any graphics drawn by this layer or any child layers (optional).
-//         tintcolor: Option<String>,
-
-//         /// Hex-formatted transparent color (#RRGGBB) (optional, imagelayer only).
-//         transparentcolor: Option<String>,
-
-//         /// Type of layer: "tilelayer", "objectgroup", "imagelayer", or "group".
-//         #[nserde(rename = "type")]
-//         typ: LayerType,
-
-//         /// Whether the layer is visible in the editor.
-//         visible: bool,
-
-//         /// Column count, same as map width for fixed-size maps (tilelayer only).
-//         width: Option<i32>,
-
-//         /// Horizontal layer offset in tiles (always 0).
-//         x: i32,
-
-//         /// Vertical layer offset in tiles (always 0).
-//         y: i32,
-//     },
-//     #[nserde(rename = "objectgroup")]
-//     ObjectGroup {
-//         /// Array of chunks (optional, tilelayer only).
-//         chunks: Option<Vec<Chunk>>,
-
-//         /// The class of the layer (since 1.9, optional).
-//         class: Option<String>,
-
-//         /// Compression type: "zlib", "gzip", "zstd" (since 1.3), or empty (default, tilelayer only).
-//         compression: Option<Compression>,
-
-//         /// Array of unsigned int (GIDs) or base64-encoded data (tilelayer only).
-//         // data: Option<Data>,
-//         data: Option<Vec<u32>>,
-
-//         /// Draw order: "topdown" (default) or "index" (objectgroup only).
-//         draworder: Option<DrawOrder>,
-
-//         /// Encoding type: "csv" (default) or "base64" (tilelayer only).
-//         encoding: Option<LayerEncoding>,
-
-//         /// Row count, same as map height for fixed-size maps (tilelayer only).
-//         height: Option<i32>,
-
-//         /// Unique incremental ID across all layers.
-//         id: i32,
-
-//         /// Image used by this layer (imagelayer only).
-//         image: Option<String>,
-
-//         /// Height of the image used by this layer (imagelayer only, since 1.11.1).
-//         imageheight: Option<i32>,
-
-//         /// Width of the image used by this layer (imagelayer only, since 1.11.1).
-//         imagewidth: Option<i32>,
-
-//         /// Array of sub-layers (group only).
-//         layers: Option<Vec<Layer>>,
-
-//         /// Whether the layer is locked in the editor (default: false, since 1.8.2).
-//         #[nserde(default)]
-//         locked: bool,
-
-//         /// Name assigned to this layer.
-//         name: String,
-
-//         /// Array of objects (objectgroup only).
-//         #[nserde(default)]
-//         objects: Option<Vec<Object>>,
-
-//         /// Horizontal layer offset in pixels (default: 0).
-//         offsetx: f64,
-
-//         /// Vertical layer offset in pixels (default: 0).
-//         offsety: f64,
-
-//         /// Opacity value between 0 and 1.
-//         opacity: f64,
-
-//         /// Horizontal parallax factor for this layer (default: 1, since 1.5).
-//         parallaxx: f64,
-
-//         /// Vertical parallax factor for this layer (default: 1, since 1.5).
-//         parallaxy: f64,
-
-//         /// Array of properties (optional).
-//         properties: Option<Vec<Property>>,
-
-//         /// Whether the image drawn by this layer is repeated along the X axis (imagelayer only, since 1.8).
-//         repeatx: Option<bool>,
-
-//         /// Whether the image drawn by this layer is repeated along the Y axis (imagelayer only, since 1.8).
-//         repeaty: Option<bool>,
-
-//         /// X coordinate where layer content starts (for infinite maps).
-//         startx: Option<i32>,
-
-//         /// Y coordinate where layer content starts (for infinite maps).
-//         starty: Option<i32>,
-
-//         /// Hex-formatted tint color (#RRGGBB or #AARRGGBB) that is multiplied with any graphics drawn by this layer or any child layers (optional).
-//         tintcolor: Option<String>,
-
-//         /// Hex-formatted transparent color (#RRGGBB) (optional, imagelayer only).
-//         transparentcolor: Option<String>,
-
-//         /// Type of layer: "tilelayer", "objectgroup", "imagelayer", or "group".
-//         #[nserde(rename = "type")]
-//         typ: LayerType,
-
-//         /// Whether the layer is visible in the editor.
-//         visible: bool,
-
-//         /// Column count, same as map width for fixed-size maps (tilelayer only).
-//         width: Option<i32>,
-
-//         /// Horizontal layer offset in tiles (always 0).
-//         x: i32,
-
-//         /// Vertical layer offset in tiles (always 0).
-//         y: i32,
-//     },
-//     #[nserde(rename = "imagelayer")]
-//     ImageLayer {
-//         /// Array of chunks (optional, tilelayer only).
-//         chunks: Option<Vec<Chunk>>,
-
-//         /// The class of the layer (since 1.9, optional).
-//         class: Option<String>,
-
-//         /// Compression type: "zlib", "gzip", "zstd" (since 1.3), or empty (default, tilelayer only).
-//         compression: Option<Compression>,
-
-//         /// Array of unsigned int (GIDs) or base64-encoded data (tilelayer only).
-//         // data: Option<Data>,
-//         data: Option<Vec<u32>>,
-
-//         /// Draw order: "topdown" (default) or "index" (objectgroup only).
-//         draworder: Option<DrawOrder>,
-
-//         /// Encoding type: "csv" (default) or "base64" (tilelayer only).
-//         encoding: Option<LayerEncoding>,
-
-//         /// Row count, same as map height for fixed-size maps (tilelayer only).
-//         height: Option<i32>,
-
-//         /// Unique incremental ID across all layers.
-//         id: i32,
-
-//         /// Image used by this layer (imagelayer only).
-//         image: Option<String>,
-
-//         /// Height of the image used by this layer (imagelayer only, since 1.11.1).
-//         imageheight: Option<i32>,
-
-//         /// Width of the image used by this layer (imagelayer only, since 1.11.1).
-//         imagewidth: Option<i32>,
-
-//         /// Array of sub-layers (group only).
-//         layers: Option<Vec<Layer>>,
-
-//         /// Whether the layer is locked in the editor (default: false, since 1.8.2).
-//         #[nserde(default)]
-//         locked: bool,
-
-//         /// Name assigned to this layer.
-//         name: String,
-
-//         /// Array of objects (objectgroup only).
-//         #[nserde(default)]
-//         objects: Option<Vec<Object>>,
-
-//         /// Horizontal layer offset in pixels (default: 0).
-//         offsetx: f64,
-
-//         /// Vertical layer offset in pixels (default: 0).
-//         offsety: f64,
-
-//         /// Opacity value between 0 and 1.
-//         opacity: f64,
-
-//         /// Horizontal parallax factor for this layer (default: 1, since 1.5).
-//         parallaxx: f64,
-
-//         /// Vertical parallax factor for this layer (default: 1, since 1.5).
-//         parallaxy: f64,
-
-//         /// Array of properties (optional).
-//         properties: Option<Vec<Property>>,
-
-//         /// Whether the image drawn by this layer is repeated along the X axis (imagelayer only, since 1.8).
-//         repeatx: Option<bool>,
-
-//         /// Whether the image drawn by this layer is repeated along the Y axis (imagelayer only, since 1.8).
-//         repeaty: Option<bool>,
-
-//         /// X coordinate where layer content starts (for infinite maps).
-//         startx: Option<i32>,
-
-//         /// Y coordinate where layer content starts (for infinite maps).
-//         starty: Option<i32>,
-
-//         /// Hex-formatted tint color (#RRGGBB or #AARRGGBB) that is multiplied with any graphics drawn by this layer or any child layers (optional).
-//         tintcolor: Option<String>,
-
-//         /// Hex-formatted transparent color (#RRGGBB) (optional, imagelayer only).
-//         transparentcolor: Option<String>,
-
-//         /// Type of layer: "tilelayer", "objectgroup", "imagelayer", or "group".
-//         #[nserde(rename = "type")]
-//         typ: LayerType,
-
-//         /// Whether the layer is visible in the editor.
-//         visible: bool,
-
-//         /// Column count, same as map width for fixed-size maps (tilelayer only).
-//         width: Option<i32>,
-
-//         /// Horizontal layer offset in tiles (always 0).
-//         x: i32,
-
-//         /// Vertical layer offset in tiles (always 0).
-//         y: i32,
-//     },
-//     #[nserde(rename = "group")]
-//     Group {
-//         /// Array of chunks (optional, tilelayer only).
-//         chunks: Option<Vec<Chunk>>,
-
-//         /// The class of the layer (since 1.9, optional).
-//         class: Option<String>,
-
-//         /// Compression type: "zlib", "gzip", "zstd" (since 1.3), or empty (default, tilelayer only).
-//         compression: Option<Compression>,
-
-//         /// Array of unsigned int (GIDs) or base64-encoded data (tilelayer only).
-//         // data: Option<Data>,
-//         data: Option<Vec<u32>>,
-
-//         /// Draw order: "topdown" (default) or "index" (objectgroup only).
-//         draworder: Option<DrawOrder>,
-
-//         /// Encoding type: "csv" (default) or "base64" (tilelayer only).
-//         encoding: Option<LayerEncoding>,
-
-//         /// Row count, same as map height for fixed-size maps (tilelayer only).
-//         height: Option<i32>,
-
-//         /// Unique incremental ID across all layers.
-//         id: i32,
-
-//         /// Image used by this layer (imagelayer only).
-//         image: Option<String>,
-
-//         /// Height of the image used by this layer (imagelayer only, since 1.11.1).
-//         imageheight: Option<i32>,
-
-//         /// Width of the image used by this layer (imagelayer only, since 1.11.1).
-//         imagewidth: Option<i32>,
-
-//         /// Array of sub-layers (group only).
-//         layers: Option<Vec<Layer>>,
-
-//         /// Whether the layer is locked in the editor (default: false, since 1.8.2).
-//         #[nserde(default)]
-//         locked: bool,
-
-//         /// Name assigned to this layer.
-//         name: String,
-
-//         /// Array of objects (objectgroup only).
-//         #[nserde(default)]
-//         objects: Option<Vec<Object>>,
-
-//         /// Horizontal layer offset in pixels (default: 0).
-//         offsetx: f64,
-
-//         /// Vertical layer offset in pixels (default: 0).
-//         offsety: f64,
-
-//         /// Opacity value between 0 and 1.
-//         opacity: f64,
-
-//         /// Horizontal parallax factor for this layer (default: 1, since 1.5).
-//         parallaxx: f64,
-
-//         /// Vertical parallax factor for this layer (default: 1, since 1.5).
-//         parallaxy: f64,
-
-//         /// Array of properties (optional).
-//         properties: Option<Vec<Property>>,
-
-//         /// Whether the image drawn by this layer is repeated along the X axis (imagelayer only, since 1.8).
-//         repeatx: Option<bool>,
-
-//         /// Whether the image drawn by this layer is repeated along the Y axis (imagelayer only, since 1.8).
-//         repeaty: Option<bool>,
-
-//         /// X coordinate where layer content starts (for infinite maps).
-//         startx: Option<i32>,
-
-//         /// Y coordinate where layer content starts (for infinite maps).
-//         starty: Option<i32>,
-
-//         /// Hex-formatted tint color (#RRGGBB or #AARRGGBB) that is multiplied with any graphics drawn by this layer or any child layers (optional).
-//         tintcolor: Option<String>,
-
-//         /// Hex-formatted transparent color (#RRGGBB) (optional, imagelayer only).
-//         transparentcolor: Option<String>,
-
-//         /// Type of layer: "tilelayer", "objectgroup", "imagelayer", or "group".
-//         #[nserde(rename = "type")]
-//         typ: LayerType,
-
-//         /// Whether the layer is visible in the editor.
-//         visible: bool,
-
-//         /// Column count, same as map width for fixed-size maps (tilelayer only).
-//         width: Option<i32>,
-
-//         /// Horizontal layer offset in tiles (always 0).
-//         x: i32,
-
-//         /// Vertical layer offset in tiles (always 0).
-//         y: i32,
-//     },
-// }
-
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 pub enum LayerType {
     #[default]
     #[nserde(rename = "tilelayer")]
@@ -536,7 +121,7 @@ pub enum LayerType {
     Group,
 }
 
-#[derive(Clone, Debug, DeJson)]
+#[derive(Clone, Debug, DeJson, SerJson)]
 pub enum Compression {
     #[nserde(rename = "zlib")]
     Zlib,
@@ -546,7 +131,7 @@ pub enum Compression {
     Zstd,
 }
 
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 pub enum DrawOrder {
     #[default]
     #[nserde(rename = "topdown")]
@@ -555,11 +140,57 @@ pub enum DrawOrder {
     Index,
 }
 
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 pub enum LayerEncoding {
     #[default]
     #[nserde(rename = "csv")]
     Csv,
     #[nserde(rename = "base64")]
     Base64,
+}
+
+impl Layer {
+    pub fn new(map: &mut Map, typ: LayerType, name: String) -> Self {
+        let id = map.next_layer_id();
+
+        let mut data = None;
+        let mut width = None;
+        let mut height = None;
+
+        match typ {
+            LayerType::TileLayer => {
+                data = Some(vec![0; (map.width * map.height) as usize]);
+                width = Some(map.width);
+                height = Some(map.height);
+            }
+            LayerType::ObjectGroup => (),
+            LayerType::ImageLayer => (),
+            LayerType::Group => (),
+        }
+
+        Self {
+            id,
+            typ,
+            name,
+            encoding: Some(LayerEncoding::Csv),
+            compression: None,
+            opacity: 1.0,
+            parallaxx: 1.0,
+            parallaxy: 1.0,
+            height,
+            width,
+            data,
+            ..Default::default()
+        }
+    }
+
+    pub fn get_tile_matrix(&mut self) -> TileMatrix<u32> {
+        match self.typ {
+            LayerType::TileLayer => {
+                let data = self.data.as_mut().unwrap();
+                TileMatrix::wrap_vec(data, self.width.unwrap() as usize)
+            }
+            _ => panic!("Layer is not a tile layer"),
+        }
+    }
 }

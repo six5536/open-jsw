@@ -8,10 +8,56 @@
     ],
     "file.lastUsedOpenFilter": "All Files (*)",
     "fileStates": {
+        "": {
+            "scaleInDock": 1
+        },
+        "#tileset": {
+            "scaleInDock": 1
+        },
+        "/Users/rich/dev/six5536/git/open-jsw/resources/mm/game/mm.json": {
+            "expandedGroupLayers": [
+                1
+            ],
+            "scale": 0.33,
+            "selectedLayer": 58,
+            "viewCenter": {
+                "x": 510.6060606060605,
+                "y": 256.060606060606
+            }
+        },
+        "/Users/rich/dev/six5536/git/open-jsw/resources/mm/game/mm.json#open_jws": {
+            "scaleInDock": 1
+        },
+        "open_jsw.json": {
+            "expandedGroupLayers": [
+                2,
+                3,
+                5,
+                6
+            ],
+            "expandedObjectLayers": [
+                2,
+                13,
+                5
+            ],
+            "scale": 0.75,
+            "selectedLayer": 8,
+            "viewCenter": {
+                "x": 471.3333333333333,
+                "y": 447.3333333333333
+            }
+        },
+        "open_jsw.json#open_jws": {
+            "scaleInDock": 4,
+            "scaleInEditor": 1
+        }
     },
+    "last.exportedFilePath": "/Users/rich/dev/six5536/git/open-jsw/tiled",
     "last.imagePath": "/Users/rich/dev/six5536/git/open-jsw/tiled",
     "map.height": 24,
+    "map.lastUsedExportFilter": "All Files (*)",
     "map.lastUsedFormat": "json",
+    "map.layerDataFormat": "3",
     "map.renderOrder": "3",
     "map.width": 32,
     "openFiles": [

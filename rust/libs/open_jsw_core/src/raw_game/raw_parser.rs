@@ -23,6 +23,7 @@ pub trait RawParser {
 
     fn extract_rooms(data: &mut ByteBuffer) -> Result<Vec<JswRawRoom>>;
     fn extract_room(data: &mut ByteBuffer, room_no: u8) -> Result<JswRawRoom>;
+    fn extract_room_layout(data: &mut ByteBuffer, room_no: u8) -> Result<[u8; 512]>;
 }
 
 pub fn read_string(data: &mut ByteBuffer, length: usize) -> io::Result<String> {

@@ -1,7 +1,7 @@
-use nanoserde::DeJson;
+use nanoserde::{DeJson, SerJson};
 
 /// Represents a Text object in Tiled.
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 #[nserde(default)]
 pub struct Text {
     /// Whether to use a bold font (default: false).
@@ -41,7 +41,7 @@ pub struct Text {
     pub wrap: bool,
 }
 
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 pub enum HorizontalAlignment {
     #[nserde(rename = "center")]
     Center,
@@ -54,7 +54,7 @@ pub enum HorizontalAlignment {
     Left,
 }
 
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 pub enum VerticalAlignment {
     #[nserde(rename = "center")]
     Center,

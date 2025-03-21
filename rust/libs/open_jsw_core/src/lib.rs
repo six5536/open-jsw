@@ -4,6 +4,7 @@
 pub use self::error::{Error, Result};
 mod error;
 
+pub mod converter;
 pub mod game;
 pub mod raw_game;
 

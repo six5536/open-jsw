@@ -1,11 +1,11 @@
 #![allow(clippy::question_mark)]
 
-use nanoserde::DeJson;
+use nanoserde::{DeJson, SerJson};
 
 use super::{object::Object, tileset::Tileset};
 
 /// Represents a Template in Tiled.
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 #[nserde(default)]
 pub struct ObjectTemplate {
     /// Type of the template.

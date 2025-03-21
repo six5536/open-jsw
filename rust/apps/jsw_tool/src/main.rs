@@ -6,7 +6,10 @@ mod error;
 
 use clap::Parser;
 use cli::{Cli, Commands};
-use open_jsw_core::raw_game::JswRawGame;
+use open_jsw_core::{
+    converter::{Converter, raw_to_tiled_converter::RawToTiledConverter},
+    raw_game::JswRawGame,
+};
 
 mod cli;
 mod logging;
@@ -52,16 +55,30 @@ fn run() -> Result<()> {
         Commands::Convert(args) => {
             println!("Converting: {:?}", args.input);
 
-            let path = &args.input;
+            let input_path = &args.input;
             // let file = File::open(path)
             //     .with_context(|| format!("Failed to load conversion input '{:?}'", path))?;
             // let res = convert(file).with_context(|| format!("Failed to convert '{:?}'", path))?;
 
-            let res = JswRawGame::from_file(path)?;
-            for room in res.rooms {
+            let raw_game = JswRawGame::from_file(input_path)?;
+            for room in &raw_game.rooms {
                 println!("{} - {:?}", room.room_no, room.name);
             }
-            // println!("{:?}", res.rooms);
+            // println!("{:?}", raw_game.rooms);
+
+            let converter = RawToTiledConverter;
+
+            let game = converter.convert(&raw_game);
+            // println!("{:?}", game);
+
+            let json = open_jsw_tiled::serialize_map(&game)?;
+
+            // Write the converted game to a file
+            if let Some(output_path) = &args.output {
+                fs::write(output_path.as_path(), &json)?;
+            }
+
+            // fs::write(output_path.as_path(), &json)?;
         }
         Commands::ReadMap(args) => {
             println!("Reading Tiled map: {:?}", args.input);
@@ -74,7 +91,7 @@ fn run() -> Result<()> {
             // let file = File::open(path)?;
             let data = fs::read_to_string(path)?;
 
-            let res = open_jsw_tiled::load_map(&data)?;
+            let res = open_jsw_tiled::deserialize_map(&data)?;
             // for room in res.rooms {
             //     println!("{} - {:?}", room.room_no, room.name);
             // }

@@ -1,6 +1,6 @@
-use nanoserde::DeJson;
+use nanoserde::{DeJson, SerJson};
 
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 pub struct Property {
     pub name: String,
     pub value: PropertyVal,
@@ -59,5 +59,32 @@ impl DeJson for PropertyVal {
         s.next_tok(i)?;
 
         Ok(v)
+    }
+}
+
+// &self, d: usize, s: &mut SerJsonState
+
+impl SerJson for PropertyVal {
+    fn ser_json(&self, _d: usize, _s: &mut nanoserde::SerJsonState) {
+        // TODO: Implement this
+        // use nanoserde::DeJsonTok;
+
+        // let v = match s.tok {
+        //     DeJsonTok::Bool(b) => PropertyVal::Boolean(b),
+        //     DeJsonTok::U64(x) => PropertyVal::UInt(x),
+        //     DeJsonTok::I64(x) => PropertyVal::Integer(x),
+        //     DeJsonTok::F64(x) => PropertyVal::Float(x),
+        //     #[allow(clippy::mem_replace_with_default)]
+        //     DeJsonTok::Str => PropertyVal::String(core::mem::replace(&mut s.strbuf, String::new())),
+        //     _ => {
+        //         return Err(s.err_token(
+        //             "Incorrect property value. Must be either string, number or boolean",
+        //         ));
+        //     }
+        // };
+
+        // s.next_tok(i)?;
+
+        // Ok(v)
     }
 }

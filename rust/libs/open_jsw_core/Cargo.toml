@@ -8,6 +8,7 @@ edition.workspace = true
 rust-version.workspace = true
 
 [dependencies]
+rust_utils = { workspace = true }
 open_jsw_tiled = { workspace = true }
 thiserror = { workspace = true }
 bytebuffer = { workspace = true }

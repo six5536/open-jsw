@@ -1,11 +1,11 @@
 #![allow(clippy::question_mark)]
 
-use nanoserde::DeJson;
+use nanoserde::{DeJson, SerJson};
 
-use super::{point::Point, property::Property, text::Text};
+use super::{map::Map, point::Point, property::Property, text::Text};
 
 /// Represents a Layer in the map.
-#[derive(Clone, Debug, Default, DeJson)]
+#[derive(Clone, Debug, Default, DeJson, SerJson)]
 #[nserde(default)]
 pub struct Object {
     /// Used to mark an object as an ellipse.
@@ -15,10 +15,10 @@ pub struct Object {
     pub gid: Option<i32>,
 
     /// Height in pixels.
-    pub height: f64,
+    pub height: u32,
 
     /// Incremental ID, unique across all objects.
-    pub id: i32,
+    pub id: u32,
 
     /// Name assigned to the object in the editor.
     pub name: String,
@@ -47,17 +47,33 @@ pub struct Object {
     /// The class of the object (was saved as `class` in 1.9, optional).
     #[nserde(rename = "type")]
     #[nserde(rename = "class")]
-    pub typ: Option<String>,
+    pub class: Option<String>,
 
     /// Whether the object is shown in the editor.
     pub visible: bool,
 
     /// Width in pixels.
-    pub width: f64,
+    pub width: u32,
 
     /// X coordinate in pixels.
     pub x: f64,
 
     /// Y coordinate in pixels.
     pub y: f64,
+}
+
+impl Object {
+    pub fn new(map: &mut Map, name: String, x: f64, y: f64, width: u32, height: u32) -> Self {
+        let id = map.next_object_id();
+
+        Self {
+            id,
+            name,
+            x,
+            y,
+            width,
+            height,
+            ..Default::default()
+        }
+    }
 }
