@@ -3,7 +3,7 @@ use bytebuffer::ByteBuffer;
 use super::{RAM_OFFSET, RawParser, read_string};
 use crate::{
     Result,
-    raw_game::{JswRawRoom, ROOM_LAYOUT_SIZE},
+    raw_game::{JswRawCell, JswRawRoom, ROOM_LAYOUT_SIZE},
 };
 
 const ROOMS_OFFSET: usize = 0x0B000 - RAM_OFFSET;
@@ -43,10 +43,14 @@ impl RawParser for RawJsw2Game {
         // Layout
         let layout = Self::extract_room_layout(data, room_no)?;
 
+        // Cells
+        let cells = Self::extract_cells(data, room_no)?;
+
         let room = JswRawRoom {
             room_no,
             name,
             layout,
+            cells,
         };
 
         Ok(room)
@@ -54,5 +58,9 @@ impl RawParser for RawJsw2Game {
 
     fn extract_room_layout(_data: &mut ByteBuffer, _room_no: u8) -> Result<[u8; ROOM_LAYOUT_SIZE]> {
         Ok([0; ROOM_LAYOUT_SIZE])
+    }
+
+    fn extract_cells(_data: &mut ByteBuffer, _room_no: u8) -> Result<Vec<JswRawCell>> {
+        Ok(vec![])
     }
 }

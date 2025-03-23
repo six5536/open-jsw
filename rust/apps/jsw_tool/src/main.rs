@@ -71,7 +71,7 @@ fn run() -> Result<()> {
             let game = converter.convert(&raw_game);
             // println!("{:?}", game);
 
-            let json = open_jsw_tiled::serialize_map(&game)?;
+            let json = open_jsw_tiled::serialize_map(&game.map)?;
 
             // Write the converted game to a file
             if let Some(output_path) = &args.output {

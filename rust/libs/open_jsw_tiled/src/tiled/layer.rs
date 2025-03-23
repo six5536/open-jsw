@@ -71,7 +71,7 @@ pub struct Layer {
     pub parallaxy: f64,
 
     /// Array of properties (optional).
-    pub properties: Option<Vec<Property>>,
+    pub properties: Vec<Property>,
 
     /// Whether the image drawn by this layer is repeated along the X axis (imagelayer only, since 1.8).
     pub repeatx: Option<bool>,

@@ -12,6 +12,8 @@ rust_utils = { workspace = true }
 open_jsw_tiled = { workspace = true }
 thiserror = { workspace = true }
 bytebuffer = { workspace = true }
+macroquad = { workspace = true }
+image = { workspace = true, features = ["png"] }
 # derive_more = { workspace = true, features = ["from", "display"] }
 # byteorder = { workspace = true }
 log = { workspace = true }

@@ -3,13 +3,15 @@ use bytebuffer::ByteBuffer;
 use super::{RAM_OFFSET, RawParser, read_string};
 use crate::{
     Result,
-    raw_game::{JswRawRoom, ROOM_LAYOUT_SIZE},
+    raw_game::{CellBehaviour, ConveyorDirection, JswRawCell, JswRawRoom, ROOM_LAYOUT_SIZE},
 };
 
 const ROOMS_OFFSET: usize = 0x0B000 - RAM_OFFSET;
 const ROOM_SIZE: usize = 0x400;
 const ROOM_COUNT: u8 = 20;
 const ROOM_NAME_LENGTH: usize = 0x20;
+const CELL_COUNT: usize = 8;
+const CELL_LENGTH: usize = 9;
 
 pub struct RawMmGame {
     //
@@ -43,10 +45,14 @@ impl RawParser for RawMmGame {
         // Layout
         let layout = Self::extract_room_layout(data, room_no)?;
 
+        // Cells
+        let cells = Self::extract_cells(data, room_no)?;
+
         let room = JswRawRoom {
             room_no,
             name,
             layout,
+            cells,
         };
 
         Ok(room)
@@ -63,5 +69,68 @@ impl RawParser for RawMmGame {
         }
 
         Ok(layout)
+    }
+
+    fn extract_cells(data: &mut ByteBuffer, room_no: u8) -> Result<Vec<JswRawCell>> {
+        let room_offset = ROOMS_OFFSET + (room_no as usize * ROOM_SIZE);
+
+        let mut cells: Vec<JswRawCell> = vec![];
+
+        // Read conveyor direction
+        let mut conveyor_direction = ConveyorDirection::Right;
+        data.set_rpos(room_offset + 0x26f);
+        if data.read_u8()? > 0 {
+            conveyor_direction = ConveyorDirection::Left;
+        }
+
+        for i in 0..CELL_COUNT {
+            data.set_rpos(room_offset + 0x220 + (i * CELL_LENGTH));
+            let attribute = data.read_u8()?;
+
+            // Skip cells with the same attribute, they are unused cells
+            if cells.iter().any(|cell| cell.id == attribute) {
+                continue;
+            }
+
+            let sprite = [
+                data.read_u8()?,
+                data.read_u8()?,
+                data.read_u8()?,
+                data.read_u8()?,
+                data.read_u8()?,
+                data.read_u8()?,
+                data.read_u8()?,
+                data.read_u8()?,
+            ];
+
+            let behaviour = Self::get_cell_behaviour(i, conveyor_direction);
+
+            let cell = JswRawCell::new(attribute, behaviour, sprite);
+            cells.push(cell);
+        }
+
+        Ok(cells)
+    }
+}
+
+impl RawMmGame {
+    fn get_cell_behaviour(cell_no: usize, conveyor_direction: ConveyorDirection) -> CellBehaviour {
+        match cell_no {
+            0 => CellBehaviour::Air,
+            1 => CellBehaviour::Water,
+            2 => CellBehaviour::Crumbly,
+            3 => CellBehaviour::Earth,
+            4 => {
+                if conveyor_direction == ConveyorDirection::Left {
+                    CellBehaviour::LConveyor
+                } else {
+                    CellBehaviour::RConveyor
+                }
+            }
+            5 => CellBehaviour::Fire,
+            6 => CellBehaviour::Fire,
+            7 => CellBehaviour::Water,
+            _ => CellBehaviour::Air,
+        }
     }
 }

@@ -1,11 +1,22 @@
 use nanoserde::{DeJson, SerJson};
 
+pub mod property_type {
+    pub const STRING: &str = "string";
+    pub const INT: &str = "int";
+    pub const FLOAT: &str = "float";
+    pub const BOOL: &str = "bool";
+    pub const COLOR: &str = "color";
+    pub const FILE: &str = "file";
+    pub const OBJECT: &str = "object";
+    pub const ARRAY: &str = "array";
+}
+
 #[derive(Clone, Debug, Default, DeJson, SerJson)]
 pub struct Property {
     pub name: String,
     pub value: PropertyVal,
     #[nserde(rename = "type")]
-    pub ty: String,
+    pub typ: String,
 }
 
 #[derive(Debug, Clone)]

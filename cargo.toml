@@ -47,6 +47,7 @@ bytebuffer = "2.3"
 macroquad = "0.4"
 macroquad-profiler = "0.2"
 nanoserde = { version = "0.2.0-beta.0", default-features = false }
+image = { version = "0.24", default-features = false }
 
 
 [workspace.lints.rust]

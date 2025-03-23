@@ -500,7 +500,9 @@ name = "open_jsw_core"
 version = "0.1.0"
 dependencies = [
  "bytebuffer",
+ "image",
  "log",
+ "macroquad",
  "open_jsw_tiled",
  "rust_utils",
  "thiserror",

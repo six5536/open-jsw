@@ -2,7 +2,7 @@ use std::io;
 
 use bytebuffer::ByteBuffer;
 
-use super::{JswRawGame, JswRawRoom};
+use super::{JswRawCell, JswRawGame, JswRawRoom};
 use crate::{Result, game::GameType};
 
 pub mod jsw2_parser;
@@ -24,6 +24,7 @@ pub trait RawParser {
     fn extract_rooms(data: &mut ByteBuffer) -> Result<Vec<JswRawRoom>>;
     fn extract_room(data: &mut ByteBuffer, room_no: u8) -> Result<JswRawRoom>;
     fn extract_room_layout(data: &mut ByteBuffer, room_no: u8) -> Result<[u8; 512]>;
+    fn extract_cells(data: &mut ByteBuffer, room_no: u8) -> Result<Vec<JswRawCell>>;
 }
 
 pub fn read_string(data: &mut ByteBuffer, length: usize) -> io::Result<String> {

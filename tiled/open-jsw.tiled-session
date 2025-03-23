@@ -28,6 +28,9 @@
         "/Users/rich/dev/six5536/git/open-jsw/resources/mm/game/mm.json#open_jws": {
             "scaleInDock": 1
         },
+        "/Users/rich/dev/six5536/git/open-jsw/resources/mm/game/mm.json#tiles": {
+            "scaleInEditor": 1
+        },
         "open_jsw.json": {
             "expandedGroupLayers": [
                 2,

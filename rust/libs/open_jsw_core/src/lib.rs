@@ -7,6 +7,7 @@ mod error;
 pub mod converter;
 pub mod game;
 pub mod raw_game;
+mod zx;
 
 // use std::io::Read;
 
