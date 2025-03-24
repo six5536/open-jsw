@@ -68,7 +68,7 @@ fn run() -> Result<()> {
 
             let converter = RawToTiledConverter;
 
-            let game = converter.convert(&raw_game);
+            let game = converter.convert(&raw_game)?;
             // println!("{:?}", game);
 
             let json = open_jsw_tiled::serialize_map(&game.map)?;

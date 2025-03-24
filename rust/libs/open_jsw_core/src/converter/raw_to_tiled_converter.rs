@@ -1,24 +1,26 @@
-use std::cmp::max;
-use std::{cell, collections::HashMap, path::PathBuf};
+use std::collections::HashMap;
 
-use macroquad::{
-    color::{BLACK, BLANK, Color, WHITE},
-    texture::Image,
-};
+use macroquad::{color::Color, texture::Image};
 // use macroquad::texture::Image;
 use open_jsw_tiled::tiled::{
     layer::{Layer, LayerType},
     map::{Map, MapOrientation},
-    property::{Property, PropertyVal, property_type},
     tileset::Tileset,
 };
 
-use crate::raw_game::{CellBehaviour, JswRawGame, JswRawRoom, ROOM_LAYOUT_SIZE};
+use crate::{
+    Error, Result,
+    error::GameConversionError,
+    image::{TRANSPARENT, create_image_from_sprite_data, create_spritesheet},
+    raw_game::{JswRawGame, JswRawRoom, ROOM_LAYOUT_SIZE},
+};
 
 use super::Converter;
 
-const EMPTY_CELL_SPRITE: [u8; 8] = [0; 8];
-const TRANSPARENT: Color = Color::new(0.0, 0.0, 0.0, 0.0);
+const CELL_WIDTH: usize = 8;
+const CELL_HEIGHT: usize = 8;
+const CELL_BYTES: usize = (CELL_WIDTH / 8) * CELL_HEIGHT;
+const EMPTY_CELL_SPRITE: [u8; CELL_BYTES] = [0; CELL_BYTES];
 
 pub struct RawToTiledConverter;
 
@@ -49,14 +51,21 @@ struct SpriteSetContext {
 }
 
 impl Converter<JswRawGame, MapWithSpritesheet> for RawToTiledConverter {
-    fn convert(&self, raw_game: &JswRawGame) -> MapWithSpritesheet {
+    fn convert(&self, raw_game: &JswRawGame) -> Result<MapWithSpritesheet> {
         let mut context = ConvertContext::new();
-        let mut map = Map::new(None, MapOrientation::Orthogonal, 32, 24, 8, 8);
+        let mut map = Map::new(
+            None,
+            MapOrientation::Orthogonal,
+            32,
+            24,
+            CELL_WIDTH as u32,
+            CELL_HEIGHT as u32,
+        );
 
-        let room_layers = self.convert_rooms(&mut context, &mut map, &raw_game.rooms);
+        let room_layers = self.convert_rooms(&mut context, &mut map, &raw_game.rooms)?;
 
         // Create the spritesheet
-        let spritesheet = self.create_spritesheet(&context, &raw_game.rooms);
+        let spritesheet = self.create_spritesheet(&context)?;
 
         // Add a dummy tileset
         let tileset = Tileset::new(
@@ -72,7 +81,7 @@ impl Converter<JswRawGame, MapWithSpritesheet> for RawToTiledConverter {
         map.layers = room_layers;
         map.tilesets.push(tileset);
 
-        MapWithSpritesheet { map, spritesheet }
+        Ok(MapWithSpritesheet { map, spritesheet })
     }
 }
 
@@ -82,17 +91,17 @@ impl RawToTiledConverter {
         context: &mut ConvertContext,
         map: &mut Map,
         rooms: &Vec<JswRawRoom>,
-    ) -> Vec<Layer> {
+    ) -> Result<Vec<Layer>> {
         let mut layers = Vec::new();
 
         for room in rooms {
-            layers.push(self.convert_room(context, map, room));
+            layers.push(self.convert_room(context, map, room)?);
         }
 
         // Layers are stored in reverse order
         layers.reverse();
 
-        layers
+        Ok(layers)
     }
 
     fn convert_room(
@@ -100,7 +109,7 @@ impl RawToTiledConverter {
         context: &mut ConvertContext,
         map: &mut Map,
         room: &JswRawRoom,
-    ) -> Layer {
+    ) -> Result<Layer> {
         let mut room_context = RoomContext::new();
         let mut room_layer = Layer::new(map, LayerType::Group, room.name.clone());
         let mut room_layer_layers = Vec::new();
@@ -137,15 +146,20 @@ impl RawToTiledConverter {
             //     continue;
             // }
 
-            let bg_sprite_image = self.create_image_from_sprite_data(
+            let bg_sprite_image = create_image_from_sprite_data(
                 &EMPTY_CELL_SPRITE,
-                8,
-                8,
+                CELL_WIDTH,
+                CELL_HEIGHT,
                 TRANSPARENT,
                 cell.paper,
-            );
-            let fg_sprite_image =
-                self.create_image_from_sprite_data(&cell.sprite, 8, 8, cell.ink, TRANSPARENT);
+            )?;
+            let fg_sprite_image = create_image_from_sprite_data(
+                &cell.sprite,
+                CELL_WIDTH,
+                CELL_HEIGHT,
+                cell.ink,
+                TRANSPARENT,
+            )?;
 
             // See if the same image already exists, otherwise add it
             let mut find_sprite_id = |image: Image| -> u32 {
@@ -180,21 +194,30 @@ impl RawToTiledConverter {
             let col = i % cols;
             let row = i / cols;
 
-            let cell = room.cells.iter().find(|c| c.id == *cell_id);
+            // Find the cell for the cell_id
+            // If the cell is not found, use the first cell (and if there is no first cell, raise an error):
+            let cell = room
+                .cells
+                .iter()
+                .find(|c| c.id == *cell_id)
+                .or(room.cells.first());
 
-            // If the cell is not found, use the first cell (and if there is no first cell, panic:
-            // TODO - don't panic, but return a Result<Error>.
-            let cell = cell
-                .or_else(|| room.cells.first())
-                .unwrap_or_else(|| panic!("No cells found for room '{}'", room.name));
-
-            if let Some(cell_context) = room_context.cells.get(&cell.id) {
-                bg_data[row][col] = cell_context.bg_sprite_id;
-                fg_data[row][col] = cell_context.fg_sprite_id;
+            if let Some(cell) = cell {
+                if let Some(cell_context) = room_context.cells.get(&cell.id) {
+                    bg_data[row][col] = cell_context.bg_sprite_id;
+                    fg_data[row][col] = cell_context.fg_sprite_id;
+                } else {
+                    bg_data[row][col] = 0;
+                    fg_data[row][col] = 0;
+                };
             } else {
-                bg_data[row][col] = 0;
-                fg_data[row][col] = 0;
-            };
+                return Err(Error::GameConversionFailed {
+                    mode: GameConversionError::RoomConversionFailed {
+                        room: room.name.clone(),
+                    },
+                    message: "No cells found".to_string(),
+                });
+            }
         }
 
         // data[0][0] = 1;
@@ -211,68 +234,44 @@ impl RawToTiledConverter {
         // Add the room to the context
         context.rooms.insert(room.room_no, room_context);
 
-        room_layer
+        Ok(room_layer)
     }
 
-    fn create_spritesheet(&self, context: &ConvertContext, rooms: &[JswRawRoom]) -> Image {
-        // let mut sprites: HashMap<u32, Image> = HashMap::new();
-
-        // let mut sprite_images: Vec<&Image> = Vec::new();
-        // let context_rooms = &context.rooms;
-        // for room in rooms {
-        //     let room_context = context_rooms.get(&room.room_no).unwrap();
-        //     for cell in &room.cells {
-        //         let cell_context = room_context.cells.get(&cell.id).unwrap();
-        //         sprite_images.push(cell_context.);
-        //         // sprites.insert(cell_context.bg_sprite_id, cell.bg_sprite.clone());
-        //         // sprites.insert(cell_context.fg_sprite_id, cell.fg_sprite.clone());
-        //     }
-        // }
-
-        let sprite_images: Vec<&Image> = context.get_cell_sprites_array();
+    fn create_spritesheet(&self, context: &ConvertContext) -> Result<Image> {
+        let sprite_images: Vec<&Image> = context.get_cell_sprites_vec();
         let spritesheet = create_spritesheet(sprite_images);
 
-        // Save to png
-        let mut path = PathBuf::from("tmp");
-        path.push("spritesheet.png");
-        image::save_buffer(&path, &spritesheet.bytes, 128, 128, image::ColorType::Rgba8).unwrap();
+        // // Save to png
+        // let mut path = PathBuf::from("tmp");
+        // path.push("spritesheet.png");
+        // image::save_buffer(
+        //     &path,
+        //     &spritesheet.bytes,
+        //     spritesheet.width as u32,
+        //     spritesheet.height as u32,
+        //     image::ColorType::Rgba8,
+        // )
+        // .unwrap();
 
-        // Hack, write to pngs
-        for (id, sprite) in context.cell_sprites.sprites.iter() {
-            let mut path = PathBuf::from("tmp");
-            path.push(format!("sprite_{}.png", id));
+        // // Hack, write to pngs
+        // for (id, sprite) in context.cell_sprites.sprites.iter() {
+        //     let mut path = PathBuf::from("tmp");
+        //     path.push(format!("sprite_{}.png", id));
 
-            // Save to png
-            image::save_buffer(&path, &sprite.bytes, 8, 8, image::ColorType::Rgba8).unwrap();
-        }
+        //     // Save to png
+        //     image::save_buffer(
+        //         &path,
+        //         &sprite.bytes,
+        //         sprite.width as u32,
+        //         sprite.height as u32,
+        //         image::ColorType::Rgba8,
+        //     )
+        //     .unwrap();
+        // }
 
         // TODO build the sprites into a spritesheet
 
-        spritesheet
-    }
-
-    fn create_image_from_sprite_data(
-        &self,
-        data: &[u8],
-        width: usize,
-        height: usize,
-        fg: Color,
-        bg: Color,
-    ) -> Image {
-        let mut image = Image::gen_image_color(width as u16, height as u16, BLANK);
-        let mut colors: Vec<Color> = vec![BLANK; width * height];
-        for (i, r) in data.iter().enumerate() {
-            for c in 0..width {
-                let bit = (r >> c) & 1;
-                let mut color = bg;
-                if bit == 1 {
-                    color = fg;
-                }
-                colors[i * 8 + c] = color;
-            }
-        }
-        image.update(&colors);
-        image
+        Ok(spritesheet)
     }
 }
 
@@ -282,26 +281,30 @@ impl ConvertContext {
             rooms: HashMap::new(),
             cell_sprites: SpriteSetContext::new(),
 
-            empty_cell_sprite: Image::gen_image_color(8, 8, BLANK),
+            empty_cell_sprite: Image::gen_image_color(
+                CELL_WIDTH as u16,
+                CELL_HEIGHT as u16,
+                TRANSPARENT,
+            ),
         }
     }
 
-    fn get_cell_sprites_array(&self) -> Vec<&Image> {
-        let mut sprites_array: Vec<&Image> = vec![];
+    fn get_cell_sprites_vec(&self) -> Vec<&Image> {
+        let mut sprites_vec: Vec<&Image> = vec![];
 
         let key_max = self.cell_sprites.sprites.keys().max().unwrap_or(&0);
 
-        for i in 1..*key_max {
+        for i in 1..=*key_max {
             let sprite = self.cell_sprites.sprites.get(&i);
 
             if let Some(sprite) = sprite {
-                sprites_array.push(sprite);
+                sprites_vec.push(sprite);
             } else {
-                sprites_array.push(&self.empty_cell_sprite);
+                sprites_vec.push(&self.empty_cell_sprite);
             }
         }
 
-        sprites_array
+        sprites_vec
     }
 }
 
@@ -336,51 +339,4 @@ fn color_to_string(color: Color) -> String {
         (color.b * 255.0) as u8,
         (color.a * 255.0) as u8
     )
-}
-
-fn create_spritesheet(images: Vec<&Image>) -> Image {
-    let count = images.len() as u32;
-    let max_width = images.iter().map(|img| img.width as u32).max().unwrap_or(1);
-    let max_height = images
-        .iter()
-        .map(|img| img.height as u32)
-        .max()
-        .unwrap_or(1);
-
-    let mut grid_size = 1;
-    while grid_size * grid_size < count {
-        grid_size *= 2;
-    }
-
-    let raw_width = grid_size * max_width;
-    let raw_height = grid_size * max_height;
-
-    // Make sure the sheet is square and size is a power of two
-    let side = max(raw_width, raw_height).next_power_of_two();
-
-    let mut sheet_bytes = vec![0u8; (side * side * 4) as usize];
-
-    for (i, image) in images.iter().enumerate() {
-        let col = (i as u32) % grid_size;
-        let row = (i as u32) / grid_size;
-
-        let x_offset = col * max_width;
-        let y_offset = row * max_height;
-
-        let image_data = image.get_image_data();
-
-        for y in 0..image.height as u32 {
-            for x in 0..image.width as u32 {
-                let dst_index = (((y_offset + y) * side + (x_offset + x)) * 4) as usize;
-                let src_index = (y * image.width as u32 + x) as usize;
-                sheet_bytes[dst_index..dst_index + 4].copy_from_slice(&image_data[src_index]);
-            }
-        }
-    }
-
-    Image {
-        bytes: sheet_bytes,
-        width: side as u16,
-        height: side as u16,
-    }
 }

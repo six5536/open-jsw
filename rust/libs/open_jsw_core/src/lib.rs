@@ -6,6 +6,7 @@ mod error;
 
 pub mod converter;
 pub mod game;
+mod image;
 pub mod raw_game;
 mod zx;
 

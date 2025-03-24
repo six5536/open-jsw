@@ -11,14 +11,28 @@ pub enum Error {
     Custom(String),
 
     // Module errors
+    #[error("Index {} is out of bounds 0..{}", .index, .length)]
+    IndexOutOfBounds { index: usize, length: usize },
+
     #[error("Game not recognised")]
     GameNotRecognised,
+
+    #[error("Game room conversion failed [{}]: {:?}", .message, .mode)]
+    GameConversionFailed {
+        mode: GameConversionError,
+        message: String,
+    },
 
     // External errors
     #[error("IO::{:?}: {}", .0, .0)]
     Io(#[from] std::io::Error),
     // #[error("FlexiLogger::{:?}: {}", .0, .0)]
     // FlexiLogger(#[from] flexi_logger::FlexiLoggerError),
+}
+
+#[derive(Debug)]
+pub enum GameConversionError {
+    RoomConversionFailed { room: String },
 }
 
 // impl Error {
