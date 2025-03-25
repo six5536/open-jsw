@@ -42,11 +42,11 @@ impl RawParser for RawMmGame {
         let raw_name = read_string(data, ROOM_NAME_LENGTH)?;
         let name = raw_name.trim().to_string();
 
-        // Layout
-        let layout = Self::extract_room_layout(data, room_no)?;
-
         // Cells
         let cells = Self::extract_cells(data, room_no)?;
+
+        // Layout
+        let layout = Self::extract_room_layout(data, room_no, &cells)?;
 
         let room = JswRawRoom {
             room_no,
@@ -58,14 +58,23 @@ impl RawParser for RawMmGame {
         Ok(room)
     }
 
-    fn extract_room_layout(data: &mut ByteBuffer, room_no: u8) -> Result<[u8; ROOM_LAYOUT_SIZE]> {
+    fn extract_room_layout(
+        data: &mut ByteBuffer,
+        room_no: u8,
+        cells: &Vec<JswRawCell>,
+    ) -> Result<[u8; ROOM_LAYOUT_SIZE]> {
         let room_offset = ROOMS_OFFSET + (room_no as usize * ROOM_SIZE);
         data.set_rpos(room_offset);
 
         let mut layout = [0; ROOM_LAYOUT_SIZE];
 
-        for byte in layout.iter_mut().take(ROOM_LAYOUT_SIZE) {
-            *byte = data.read_u8()?;
+        for byte_out in layout.iter_mut().take(ROOM_LAYOUT_SIZE) {
+            let byte_in = data.read_u8()?;
+
+            *byte_out = match cells.iter().find(|cell| cell.attribute == byte_in) {
+                Some(cell) => cell.id,
+                None => 0,
+            };
         }
 
         Ok(layout)
@@ -88,7 +97,7 @@ impl RawParser for RawMmGame {
             let attribute = data.read_u8()?;
 
             // Skip cells with the same attribute, they are unused cells
-            if cells.iter().any(|cell| cell.id == attribute) {
+            if cells.iter().any(|cell| cell.attribute == attribute) {
                 continue;
             }
 
@@ -105,7 +114,7 @@ impl RawParser for RawMmGame {
 
             let behaviour = Self::get_cell_behaviour(i, conveyor_direction);
 
-            let cell = JswRawCell::new(attribute, behaviour, sprite);
+            let cell = JswRawCell::new(i as u8, attribute, behaviour, sprite);
             cells.push(cell);
         }
 

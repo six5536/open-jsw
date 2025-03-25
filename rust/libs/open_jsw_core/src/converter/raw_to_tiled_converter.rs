@@ -199,11 +199,6 @@ impl RawToTiledConverter {
             let col = i % cols;
             let row = i / cols;
 
-            // TODO - problem is the data in manic miner layout and currently the raw game data
-            // layout is the ink/paper attribute, but in JSW it is an index to the cell.
-            // Should make the index to the cell the cell ID, and store the attribute (ink/paper) in the cell data.
-            // Then both games can use the same layout data.
-
             // Find the cell for the cell_id
             // If the cell is not found, use the first cell (and if there is no first cell, raise an error):
             let cell = room

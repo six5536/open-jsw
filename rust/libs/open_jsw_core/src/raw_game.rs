@@ -31,6 +31,7 @@ pub struct JswRawRoom {
 
 pub struct JswRawCell {
     pub id: u8,
+    pub attribute: u8,
     pub behaviour: CellBehaviour,
     pub ink: Color,
     pub paper: Color,
@@ -112,9 +113,10 @@ impl JswRawGame {
 }
 
 impl JswRawCell {
-    pub fn new(attribute: u8, behaviour: CellBehaviour, sprite: [u8; 8]) -> Self {
+    pub fn new(id: u8, attribute: u8, behaviour: CellBehaviour, sprite: [u8; 8]) -> Self {
         Self {
-            id: attribute,
+            id,
+            attribute,
             behaviour,
             ink: Self::ink(&attribute),
             paper: Self::paper(&attribute),

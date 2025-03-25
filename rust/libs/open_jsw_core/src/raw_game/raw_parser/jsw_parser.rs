@@ -1,5 +1,3 @@
-use std::os::macos::raw;
-
 use bytebuffer::ByteBuffer;
 
 use super::{RAM_OFFSET, RawParser, read_string};
@@ -58,11 +56,11 @@ impl RawParser for RawJswGame {
         let raw_name = read_string(data, ROOM_NAME_LENGTH)?;
         let name = raw_name.trim().to_string();
 
-        // Layout
-        let layout = Self::extract_room_layout(data, room_no)?;
-
         // Cells
         let cells = Self::extract_cells(data, room_no)?;
+
+        // Layout
+        let layout = Self::extract_room_layout(data, room_no, &cells)?;
 
         let room = JswRawRoom {
             room_no,
@@ -74,7 +72,11 @@ impl RawParser for RawJswGame {
         Ok(room)
     }
 
-    fn extract_room_layout(data: &mut ByteBuffer, room_no: u8) -> Result<[u8; ROOM_LAYOUT_SIZE]> {
+    fn extract_room_layout(
+        data: &mut ByteBuffer,
+        room_no: u8,
+        _cells: &Vec<JswRawCell>,
+    ) -> Result<[u8; ROOM_LAYOUT_SIZE]> {
         // Read conveyor direction, position & length
         // let conveyor_and_ramp = Self::get_conveyor_and_ramp(data, room_no)?;
         // TODO - need to use this info to modify the layout with conveyors and ramps
@@ -117,7 +119,7 @@ impl RawParser for RawJswGame {
             let attribute = data.read_u8()?;
 
             // Skip cells with the same attribute, they are unused cells
-            if cells.iter().any(|cell| cell.id == attribute) {
+            if cells.iter().any(|cell| cell.attribute == attribute) {
                 continue;
             }
 
@@ -138,7 +140,7 @@ impl RawParser for RawJswGame {
                 conveyor_and_ramp.ramp_direction,
             );
 
-            let cell = JswRawCell::new(attribute, behaviour, sprite);
+            let cell = JswRawCell::new(i as u8, attribute, behaviour, sprite);
             cells.push(cell);
         }
 

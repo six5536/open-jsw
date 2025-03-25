@@ -40,11 +40,11 @@ impl RawParser for RawJsw2Game {
         let raw_name = read_string(data, ROOM_NAME_LENGTH)?;
         let name = raw_name.trim().to_string();
 
-        // Layout
-        let layout = Self::extract_room_layout(data, room_no)?;
-
         // Cells
         let cells = Self::extract_cells(data, room_no)?;
+
+        // Layout
+        let layout = Self::extract_room_layout(data, room_no, &cells)?;
 
         let room = JswRawRoom {
             room_no,
@@ -56,7 +56,11 @@ impl RawParser for RawJsw2Game {
         Ok(room)
     }
 
-    fn extract_room_layout(_data: &mut ByteBuffer, _room_no: u8) -> Result<[u8; ROOM_LAYOUT_SIZE]> {
+    fn extract_room_layout(
+        _data: &mut ByteBuffer,
+        _room_no: u8,
+        _cells: &Vec<JswRawCell>,
+    ) -> Result<[u8; ROOM_LAYOUT_SIZE]> {
         Ok([0; ROOM_LAYOUT_SIZE])
     }
 
