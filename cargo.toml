@@ -10,6 +10,9 @@ members = [
   "rust/libs/open_jsw_core",
   "rust/libs/open_jsw_tiled",
   "rust/libs/rust_utils",
+
+  # Build
+  "xtask",
 ]
 
 default-members = [
@@ -42,12 +45,22 @@ thiserror = "2.0"
 clap = "4.5"
 flexi_logger = "0.29"
 log = "0.4"
+toml = "0.8"
+glob = "0.3"
 # byteorder = "1.5"
 bytebuffer = "2.3"
 macroquad = "0.4"
 macroquad-profiler = "0.2"
 nanoserde = { version = "0.2.0-beta.0", default-features = false }
 image = { version = "0.24", default-features = false }
+
+
+[profile.release]
+opt-level = 3       # Enables full optimizations for size and speed
+lto = true          # Enables Link-Time Optimization
+panic = "abort"     # Optional: reduces binary size by avoiding panic unwind code
+strip = "debuginfo" # Strips debug information from the binary
+codegen-units = 1   # Reduces the number of codegen units for further optimization
 
 
 [workspace.lints.rust]

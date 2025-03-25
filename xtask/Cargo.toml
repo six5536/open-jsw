@@ -1,0 +1,17 @@
+[package]
+name = "xtask"
+version.workspace = true
+authors.workspace = true
+description = "Open JSW xtask buildsystem"
+documentation.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+thiserror = { workspace = true }
+clap = { workspace = true, features = ["derive"] }
+toml = { workspace = true }
+glob = { workspace = true }
+
+[lints]
+workspace = true

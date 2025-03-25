@@ -1,3 +1,4 @@
+use nanoserde::DeJsonErrReason;
 use thiserror::Error;
 
 pub type Result<T> = core::result::Result<T, Error>;
@@ -5,9 +6,9 @@ pub type Result<T> = core::result::Result<T, Error>;
 
 #[derive(Error, Debug)]
 pub enum Error {
-    #[error("[Line:{}, Col:{}] {}", .line, .col, .msg)]
+    #[error("[Line:{}, Col:{}] {:?}", .line, .col, .msg)]
     DeJsonErr {
-        msg: String,
+        msg: DeJsonErrReason,
         line: usize,
         col: usize,
     },
