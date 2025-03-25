@@ -64,6 +64,12 @@ pub enum ConveyorDirection {
     Right,
 }
 
+#[derive(Copy, Clone, PartialEq, Eq)]
+pub enum RampDirection {
+    Left,
+    Right,
+}
+
 impl JswRawGame {
     pub fn new(game_type: GameType, rooms: Vec<JswRawRoom>) -> Self {
         Self { game_type, rooms }

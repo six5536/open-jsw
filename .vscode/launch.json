@@ -12,7 +12,7 @@
       "cargo": {
         "args": ["build", "--manifest-path", "${workspaceFolder}/rust/apps/jsw_tool/Cargo.toml"]
       },
-      "args": ["convert", "./resources/mm/bin/mm.bin", "./resources/mm/game/"],
+      "args": ["convert", "./resources/mm/bin/mm.bin", "./resources/mm/game"],
       "sourceLanguages": ["rust"]
     },
     {
@@ -23,7 +23,7 @@
       "cargo": {
         "args": ["build", "--manifest-path", "${workspaceFolder}/rust/apps/jsw_tool/Cargo.toml"]
       },
-      "args": ["convert", "./resources/mm/bin/mm.tap", "./resources/mm/game/"],
+      "args": ["convert", "./resources/mm/bin/mm.tap", "./resources/mm/game"],
       "sourceLanguages": ["rust"]
     },
     {
@@ -34,7 +34,7 @@
       "cargo": {
         "args": ["build", "--manifest-path", "${workspaceFolder}/rust/apps/jsw_tool/Cargo.toml"]
       },
-      "args": ["convert", "./resources/mm/bin/mm.tzx", "./resources/mm/game/"],
+      "args": ["convert", "./resources/mm/bin/mm.tzx", "./resources/mm/game"],
       "sourceLanguages": ["rust"]
     },
     {
@@ -45,7 +45,7 @@
       "cargo": {
         "args": ["build", "--manifest-path", "${workspaceFolder}/rust/apps/jsw_tool/Cargo.toml"]
       },
-      "args": ["convert", "./resources/jsw/bin/jsw.bin", "./resources/jsw/game/"],
+      "args": ["convert", "./resources/jsw/bin/jsw.bin", "./resources/jsw/game"],
       "sourceLanguages": ["rust"]
     },
     {
@@ -56,7 +56,7 @@
       "cargo": {
         "args": ["build", "--manifest-path", "${workspaceFolder}/rust/apps/jsw_tool/Cargo.toml"]
       },
-      "args": ["convert", "./resources/jsw/bin/jsw.tap", "./resources/jsw/game/"],
+      "args": ["convert", "./resources/jsw/bin/jsw.tap", "./resources/jsw/game"],
       "sourceLanguages": ["rust"]
     },
     {
@@ -67,7 +67,7 @@
       "cargo": {
         "args": ["build", "--manifest-path", "${workspaceFolder}/rust/apps/jsw_tool/Cargo.toml"]
       },
-      "args": ["convert", "./resources/jsw/bin/jsw.tzx", "./resources/jsw/game/"],
+      "args": ["convert", "./resources/jsw/bin/jsw.tzx", "./resources/jsw/game"],
       "sourceLanguages": ["rust"]
     },
     {
@@ -87,7 +87,7 @@
       "cargo": {
         "args": ["build", "--manifest-path", "${workspaceFolder}/rust/apps/jsw_tool/Cargo.toml"]
       },
-      "args": ["convert", "./tiled/open_jsw.json", "./resources/mm/game/"],
+      "args": ["convert", "./tiled/open_jsw.json", "./resources/mm/game"],
       "sourceLanguages": ["rust"]
     }
   ]

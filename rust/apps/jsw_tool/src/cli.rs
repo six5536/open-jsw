@@ -4,7 +4,7 @@ use std::path::PathBuf;
 use clap::{Args, Parser, Subcommand};
 
 mod validation;
-use validation::file_exists;
+use validation::{file_exists, is_not_file_and_parent_dir_exists};
 
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
@@ -39,8 +39,8 @@ pub struct ConvertArgs {
     pub input: PathBuf,
 
     /// Output directory
-    // #[arg(value_parser = dir_exists)]
-    pub output: Option<PathBuf>,
+    #[arg(value_parser = is_not_file_and_parent_dir_exists)]
+    pub output: PathBuf,
     // output: Option<String>,
 }
 

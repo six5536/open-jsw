@@ -24,6 +24,9 @@ pub enum Error {
     #[error("IO::{:?}: {}", .0, .0)]
     Io(#[from] std::io::Error),
 
+    #[error("ImageError::{:?}: {}", .0, .0)]
+    ImageError(#[from] image::ImageError),
+
     #[error("FlexiLogger::{:?}: {}", .0, .0)]
     FlexiLogger(#[from] flexi_logger::FlexiLoggerError),
 }

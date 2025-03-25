@@ -26,7 +26,8 @@ pub struct RawToTiledConverter;
 
 pub struct MapWithSpritesheet {
     pub map: Map,
-    pub spritesheet: Image,
+    pub cell_spritesheet: Image,
+    pub cell_sprites: HashMap<u32, Image>,
 }
 
 struct ConvertContext {
@@ -65,12 +66,12 @@ impl Converter<JswRawGame, MapWithSpritesheet> for RawToTiledConverter {
         let room_layers = self.convert_rooms(&mut context, &mut map, &raw_game.rooms)?;
 
         // Create the spritesheet
-        let spritesheet = self.create_spritesheet(&context)?;
+        let cell_spritesheet = self.create_cell_spritesheet(&context)?;
 
         // Add a dummy tileset
         let tileset = Tileset::new(
-            "tiles".to_string(),
-            "spritesheet.png".to_string(),
+            "cells".to_string(),
+            "gfx/cells.png".to_string(),
             8 * 16,
             8 * 16,
             8,
@@ -81,7 +82,11 @@ impl Converter<JswRawGame, MapWithSpritesheet> for RawToTiledConverter {
         map.layers = room_layers;
         map.tilesets.push(tileset);
 
-        Ok(MapWithSpritesheet { map, spritesheet })
+        Ok(MapWithSpritesheet {
+            map,
+            cell_spritesheet,
+            cell_sprites: context.cell_sprites.sprites,
+        })
     }
 }
 
@@ -194,6 +199,11 @@ impl RawToTiledConverter {
             let col = i % cols;
             let row = i / cols;
 
+            // TODO - problem is the data in manic miner layout and currently the raw game data
+            // layout is the ink/paper attribute, but in JSW it is an index to the cell.
+            // Should make the index to the cell the cell ID, and store the attribute (ink/paper) in the cell data.
+            // Then both games can use the same layout data.
+
             // Find the cell for the cell_id
             // If the cell is not found, use the first cell (and if there is no first cell, raise an error):
             let cell = room
@@ -237,7 +247,7 @@ impl RawToTiledConverter {
         Ok(room_layer)
     }
 
-    fn create_spritesheet(&self, context: &ConvertContext) -> Result<Image> {
+    fn create_cell_spritesheet(&self, context: &ConvertContext) -> Result<Image> {
         let sprite_images: Vec<&Image> = context.get_cell_sprites_vec();
         let spritesheet = create_spritesheet(sprite_images);
 

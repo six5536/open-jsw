@@ -157,7 +157,47 @@ pub fn convert_mm() -> Result<()> {
             "jsw_tool",
             "convert",
             "./resources/mm/bin/mm.tzx",
-            "./resources/mm/game/mm.json",
+            "./resources/mm/game",
+        ])
+        .status()?;
+
+    if !status.success() {
+        Err(Error::Text("cargo run failed".into()))?;
+    }
+
+    Ok(())
+}
+
+pub fn convert_jsw() -> Result<()> {
+    let status = Command::new(cargo_path())
+        .current_dir(project_root())
+        .args([
+            "run",
+            "--bin",
+            "jsw_tool",
+            "convert",
+            "./resources/jsw/bin/jsw.tzx",
+            "./resources/jsw/game",
+        ])
+        .status()?;
+
+    if !status.success() {
+        Err(Error::Text("cargo run failed".into()))?;
+    }
+
+    Ok(())
+}
+
+pub fn convert_jsw2() -> Result<()> {
+    let status = Command::new(cargo_path())
+        .current_dir(project_root())
+        .args([
+            "run",
+            "--bin",
+            "jsw_tool",
+            "convert",
+            "./resources/jsw2/bin/jsw2.tzx",
+            "./resources/jsw2/game",
         ])
         .status()?;
 

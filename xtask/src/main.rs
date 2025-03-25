@@ -39,48 +39,8 @@ fn run() -> Result<()> {
         Commands::Run(args) => commands::run(args)?,
         Commands::Dist(args) => commands::dist(args)?,
         Commands::ConvertMm => commands::convert_mm()?,
-    }
-
-    Ok(())
-}
-
-fn dist() -> Result<()> {
-    let _ = fs::remove_dir_all(dist_dir());
-    fs::create_dir_all(dist_dir())?;
-
-    dist_binary()?;
-    // dist_manpage()?;
-
-    Ok(())
-}
-
-fn dist_binary() -> Result<()> {
-    let status = Command::new(cargo_path())
-        .current_dir(project_root())
-        .args(["build", "--release"])
-        .status()?;
-
-    if !status.success() {
-        Err(Error::Text("cargo build failed".into()))?;
-    }
-
-    let dst = project_root().join("target/release/hello-world");
-
-    fs::copy(&dst, dist_dir().join("hello-world"))?;
-
-    if Command::new("strip")
-        .arg("--version")
-        .stdout(Stdio::null())
-        .status()
-        .is_ok()
-    {
-        eprintln!("stripping the binary");
-        let status = Command::new("strip").arg(&dst).status()?;
-        if !status.success() {
-            Err(Error::Text("strip failed".into()))?;
-        }
-    } else {
-        eprintln!("no `strip` utility found")
+        Commands::ConvertJsw => commands::convert_jsw()?,
+        Commands::ConvertJsw2 => commands::convert_jsw2()?,
     }
 
     Ok(())

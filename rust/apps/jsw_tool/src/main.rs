@@ -55,12 +55,16 @@ fn run() -> Result<()> {
         Commands::Convert(args) => {
             println!("Converting: {:?}", args.input);
 
-            let input_path = &args.input;
-            // let file = File::open(path)
-            //     .with_context(|| format!("Failed to load conversion input '{:?}'", path))?;
-            // let res = convert(file).with_context(|| format!("Failed to convert '{:?}'", path))?;
+            let input_file_path = &args.input;
+            let output_dir_path = &args.output;
 
-            let raw_game = JswRawGame::from_file(input_path)?;
+            // Get the base folder of the output path, and create a gfx folder
+            let output_map_file_path = output_dir_path.join("map.json");
+            let gfx_dir_path = output_dir_path.join("gfx");
+            let gfx_cells_dir_path = gfx_dir_path.join("cells");
+            let cell_spritesheet_path = gfx_dir_path.join("cells.png");
+
+            let raw_game = JswRawGame::from_file(input_file_path)?;
             for room in &raw_game.rooms {
                 println!("{} - {:?}", room.room_no, room.name);
             }
@@ -74,8 +78,38 @@ fn run() -> Result<()> {
             let json = open_jsw_tiled::serialize_map(&game.map)?;
 
             // Write the converted game to a file
-            if let Some(output_path) = &args.output {
-                fs::write(output_path.as_path(), &json)?;
+            fs::write(output_map_file_path.as_path(), &json).map_err(|source| {
+                Error::Custom(format!(
+                    "Cannot write map file: {} {:?}",
+                    output_map_file_path.as_path().to_string_lossy(),
+                    source
+                ))
+            })?;
+
+            // Create the gfx folders
+            fs::create_dir_all(&gfx_dir_path)?;
+            fs::create_dir_all(&gfx_cells_dir_path)?;
+
+            // Write the cell spritesheet to the gfx folder
+            let cell_spritesheet = game.cell_spritesheet;
+            image::save_buffer(
+                &cell_spritesheet_path,
+                &cell_spritesheet.bytes,
+                cell_spritesheet.width as u32,
+                cell_spritesheet.height as u32,
+                image::ColorType::Rgba8,
+            )?;
+
+            // Write the cell images to the cells folder
+            for (id, sprite) in game.cell_sprites.iter() {
+                let cell_path = gfx_cells_dir_path.join(format!("cell_{:05}.png", id));
+                image::save_buffer(
+                    &cell_path,
+                    &sprite.bytes,
+                    sprite.width as u32,
+                    sprite.height as u32,
+                    image::ColorType::Rgba8,
+                )?;
             }
 
             // fs::write(output_path.as_path(), &json)?;

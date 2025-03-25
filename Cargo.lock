@@ -373,6 +373,7 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "flexi_logger",
+ "image",
  "log",
  "open_jsw_core",
  "open_jsw_tiled",
@@ -524,7 +525,6 @@ name = "open_jsw_core"
 version = "0.1.0"
 dependencies = [
  "bytebuffer",
- "image",
  "log",
  "macroquad",
  "open_jsw_tiled",

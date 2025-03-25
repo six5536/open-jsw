@@ -15,3 +15,4 @@ thiserror = { workspace = true }
 flexi_logger = { workspace = true, features = ["colors"] }
 log = { workspace = true }
 clap = { workspace = true, features = ["derive"] }
+image = { workspace = true, features = ["png"] }

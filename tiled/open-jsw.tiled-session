@@ -15,20 +15,31 @@
         "#tileset": {
             "scaleInDock": 1
         },
+        "/Users/rich/dev/six5536/git/open-jsw/resources/mm/game/map.json": {
+            "scale": 3.5328125,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 127.9433878814684,
+                "y": 139.12428129146394
+            }
+        },
+        "/Users/rich/dev/six5536/git/open-jsw/resources/mm/game/map.json#cells": {
+            "scaleInDock": 2
+        },
         "/Users/rich/dev/six5536/git/open-jsw/resources/mm/game/mm.json": {
             "expandedGroupLayers": [
+                53,
+                5,
+                10,
                 1,
                 4,
-                53,
-                10,
-                7,
-                5
+                7
             ],
             "scale": 3,
             "selectedLayer": 79,
             "viewCenter": {
-                "x": 118.83333333333331,
-                "y": 117.16666666666666
+                "x": 116.33333333333333,
+                "y": 114.5
             }
         },
         "/Users/rich/dev/six5536/git/open-jsw/resources/mm/game/mm.json#open_jws": {
@@ -53,8 +64,8 @@
             "scale": 0.75,
             "selectedLayer": 8,
             "viewCenter": {
-                "x": 511.3333333333333,
-                "y": 375.9999999999999
+                "x": 470.66666666666663,
+                "y": 447.3333333333333
             }
         },
         "open_jsw.json#open_jws": {
@@ -76,8 +87,8 @@
     ],
     "project": "open-jsw.tiled-project",
     "recentFiles": [
-        "open_jsw.json",
-        "/Users/rich/dev/six5536/git/open-jsw/resources/mm/game/mm.json"
+        "/Users/rich/dev/six5536/git/open-jsw/resources/mm/game/mm.json",
+        "open_jsw.json"
     ],
     "tileset.embedInMap": true
 }

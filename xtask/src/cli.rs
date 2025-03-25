@@ -1,5 +1,4 @@
 // use clap::value_parser;
-use std::path::PathBuf;
 
 use clap::{Args, Parser, Subcommand, ValueEnum};
 
@@ -36,8 +35,14 @@ pub enum Commands {
     /// Build an application for release
     Dist(DistArgs),
 
-    /// Convert ./resources/mm/bin/mm.tzx to ./resources/mm/bin/mm.json
+    /// Convert ./resources/mm/bin/mm.tzx to ./resources/mm/game
     ConvertMm,
+
+    /// Convert ./resources/jsw/bin/jsw.tzx to ./resources/jsw/game
+    ConvertJsw,
+
+    /// Convert ./resources/jsw2/bin/jsw2.tzx to ./resources/jsw2/game
+    ConvertJsw2,
 }
 
 #[derive(Args)]
