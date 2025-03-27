@@ -17,14 +17,13 @@
         },
         "/Users/rich/dev/six5536/git/open-jsw/resources/jsw/game/map.json": {
             "expandedGroupLayers": [
-                5,
                 233
             ],
             "scale": 4.3677734374999995,
             "selectedLayer": 3,
             "viewCenter": {
                 "x": 127.98282877968074,
-                "y": 96.04435898582481
+                "y": 4.464517283012114
             }
         },
         "/Users/rich/dev/six5536/git/open-jsw/resources/jsw/game/map.json#cells": {

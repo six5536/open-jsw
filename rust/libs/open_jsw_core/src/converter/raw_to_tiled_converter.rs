@@ -72,8 +72,10 @@ impl Converter<JswRawGame, MapWithSpritesheet> for RawToTiledConverter {
         let tileset = Tileset::new(
             "cells".to_string(),
             "gfx/cells.png".to_string(),
-            8 * 16,
-            8 * 16,
+            // 8 * 16,
+            // 8 * 16,
+            8 * 32,
+            8 * 32,
             8,
             8,
             1,

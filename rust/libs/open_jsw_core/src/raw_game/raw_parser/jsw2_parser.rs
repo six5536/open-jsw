@@ -143,7 +143,30 @@ impl RawJsw2Game {
         let room_layout_addr = Self::read_addr_16(data)? as usize;
         data.set_rpos(room_layout_addr);
 
-        Ok([0; ROOM_LAYOUT_SIZE])
+        let mut layout = [0; ROOM_LAYOUT_SIZE];
+
+        let mut count = 0;
+        let mut index = 0;
+
+        for byte_out in layout.iter_mut().take(ROOM_LAYOUT_SIZE) {
+            if count == 0 {
+                let byte_in = data.read_u8()?;
+
+                if byte_in < 0x90 {
+                    index = (byte_in >> 4) & 0x0F;
+                    count = (byte_in & 0x0F) + 1;
+                } else {
+                    // Empty cell
+                    index = 0;
+                    count = byte_in - 0x7F;
+                }
+            }
+
+            *byte_out = index;
+            count = count.saturating_sub(1);
+        }
+
+        Ok(layout)
     }
 
     fn extract_cells(
@@ -156,27 +179,34 @@ impl RawJsw2Game {
         data.set_rpos(room_offset + 2); // hbits offset
         let hbits = data.read_u8()?;
 
+        let empty_sprite: [u8; 8] = [0; 8];
+        let cell = JswRawCell::new(0, 0, Self::get_cell_behaviour(0), empty_sprite);
+        cells.push(cell);
+
         for (i, cell_low_byte) in data.read_bytes(8)?.iter().enumerate() {
             let cell_word = u16::from_be_bytes([(hbits >> (7 - i)) & 0x01, *cell_low_byte]);
             let cell_addr = ((cell_word as usize) * 9 + 0x8C78) - RAM_OFFSET;
 
             data.set_rpos(cell_addr);
-            let attribute = data.read_u8()?;
+            let mut attribute = data.read_u8()?;
 
             let sprite = [
-                data.read_u8()?,
-                data.read_u8()?,
-                data.read_u8()?,
-                data.read_u8()?,
-                data.read_u8()?,
-                data.read_u8()?,
-                data.read_u8()?,
-                data.read_u8()?,
+                data.read_u8()?.reverse_bits(),
+                data.read_u8()?.reverse_bits(),
+                data.read_u8()?.reverse_bits(),
+                data.read_u8()?.reverse_bits(),
+                data.read_u8()?.reverse_bits(),
+                data.read_u8()?.reverse_bits(),
+                data.read_u8()?.reverse_bits(),
+                data.read_u8()?.reverse_bits(),
             ];
 
-            let behaviour = Self::get_cell_behaviour(i);
+            let behaviour = Self::get_cell_behaviour(i + 1);
+            if (behaviour == CellBehaviour::Item) {
+                attribute = 0x07 | 0x80; // Bright white
+            }
 
-            let cell = JswRawCell::new(i as u8, attribute, behaviour, sprite);
+            let cell = JswRawCell::new(i as u8 + 1, attribute, behaviour, sprite);
             cells.push(cell);
         }
 
@@ -296,14 +326,15 @@ impl RawJsw2Game {
 
     fn get_cell_behaviour(cell_no: usize) -> CellBehaviour {
         match cell_no {
-            0 => CellBehaviour::Water,
-            1 => CellBehaviour::Earth,
-            2 => CellBehaviour::Fire,
-            3 => CellBehaviour::RRamp,
-            4 => CellBehaviour::LConveyor,
-            5 => CellBehaviour::Item,
-            6 => CellBehaviour::RRamp,
-            7 => CellBehaviour::RConveyor,
+            0 => CellBehaviour::Air,
+            1 => CellBehaviour::Water,
+            2 => CellBehaviour::Earth,
+            3 => CellBehaviour::Fire,
+            4 => CellBehaviour::RRamp,
+            5 => CellBehaviour::LConveyor,
+            6 => CellBehaviour::Item,
+            7 => CellBehaviour::RRamp,
+            8 => CellBehaviour::RConveyor,
             _ => CellBehaviour::Air,
         }
     }

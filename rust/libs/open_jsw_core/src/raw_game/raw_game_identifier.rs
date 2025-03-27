@@ -123,7 +123,7 @@ const MM_SIGNATURE: &[u8] = &[
     0x10, 0xD0, 0xAF, 0xC9, 0x3A, 0x07,
 ];
 const MM_SIGNATURE_OFFSET: usize = 0x0FF4;
-const MM_GAME_LENGTH: usize = 0x7FFF; // 32767; 32kB
+const MM_GAME_LENGTH: usize = 0x7FFF; // 32767; 32kB // TODO - check this length - seems to be 1 byte too short (the bin file)
 
 const JSW_SIGNATURE: &[u8] = &[
     0x06, 0x10, 0xCB, 0x41, 0x1A, 0x28, 0x04, 0xA6, 0xC0, 0x1A, 0xB6, 0x77, 0x2C, 0x13, 0xCB, 0x41,
@@ -133,7 +133,7 @@ const JSW_SIGNATURE: &[u8] = &[
 ];
 const JSW_SIGNATURE_OFFSET: usize = 0x1456;
 // const JSW_GAME_LENGTH: usize = 0x7CFF;
-const JSW_GAME_LENGTH: usize = 0x7FFF;
+const JSW_GAME_LENGTH: usize = 0x7FFF; // TODO - check this length (the bin file)
 
 const JSW2_SIGNATURE: &[u8] = &[
     0x00, 0x70, 0x00, 0x68, 0x01, 0x61, 0xD6, 0x81, 0xD6, 0xD0, 0x00, 0x1C, 0x07, 0x00, 0x00, 0x00,
@@ -144,4 +144,4 @@ const JSW2_SIGNATURE: &[u8] = &[
 
 const JSW2_SIGNATURE_OFFSET: usize = 0x1470;
 // const JSW2_GAME_LENGTH: usize = 0x7FFF;
-const JSW2_GAME_LENGTH: usize = 0xA3FF;
+const JSW2_GAME_LENGTH: usize = 0xA3FF; // TODO - check this length
