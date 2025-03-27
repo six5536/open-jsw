@@ -1,7 +1,7 @@
 // use byteorder::{LittleEndian, ReadBytesExt};
 use std::{fs::File, io::Read, path::PathBuf};
 
-use bytebuffer::{ByteBuffer, Endian::BigEndian};
+use bytebuffer::{ByteBuffer, Endian::BigEndian, Endian::LittleEndian};
 use macroquad::color::Color;
 use raw_game_identifier::RawGameData;
 use raw_parser::{
@@ -53,6 +53,7 @@ pub enum CellBehaviour {
     LConveyor,
     RConveyor,
     Crumbly,
+    Item,
     Door,
     Trigger,
     Trampoline,
@@ -100,7 +101,7 @@ impl JswRawGame {
         let game_bytes = game_data.game_bytes();
 
         let mut data = ByteBuffer::from_bytes(game_bytes);
-        data.set_endian(BigEndian);
+        data.set_endian(LittleEndian);
 
         let game_type = game_data.game_type().clone();
 

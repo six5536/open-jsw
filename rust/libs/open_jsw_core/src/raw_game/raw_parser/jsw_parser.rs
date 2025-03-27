@@ -1,15 +1,17 @@
 use bytebuffer::ByteBuffer;
 
-use super::{RAM_OFFSET, RawParser, read_string};
+use super::{RawParser, read_string};
 use crate::{
     Result,
+    game::GameType,
     raw_game::{
-        CellBehaviour, ConveyorDirection, JswRawCell, JswRawRoom, ROOM_LAYOUT_SIZE,
+        CellBehaviour, ConveyorDirection, JswRawCell, JswRawGame, JswRawRoom, ROOM_LAYOUT_SIZE,
         ROOM_LAYOUT_WIDTH, RampDirection,
     },
 };
 
-const ROOMS_OFFSET: usize = 0x0C000 - RAM_OFFSET;
+const ADDR_OFFSET: usize = 0x8000;
+const ROOMS_OFFSET: usize = 0x0C000 - ADDR_OFFSET;
 const ROOM_SIZE: usize = 0x100;
 const ROOM_COUNT: u8 = 60;
 const ROOM_NAME_LENGTH: usize = 0x20;
@@ -32,6 +34,17 @@ pub struct ConveyorAndRamp {
 }
 
 impl RawParser for RawJswGame {
+    fn extract_game(game_type: GameType, data: &mut ByteBuffer) -> Result<JswRawGame> {
+        let raw_game = JswRawGame {
+            game_type,
+            rooms: Self::extract_rooms(data)?,
+        };
+
+        Ok(raw_game)
+    }
+}
+
+impl RawJswGame {
     fn extract_rooms(data: &mut ByteBuffer) -> Result<Vec<JswRawRoom>> {
         let mut rooms: Vec<JswRawRoom> = vec![];
 
@@ -75,7 +88,7 @@ impl RawParser for RawJswGame {
     fn extract_room_layout(
         data: &mut ByteBuffer,
         room_no: u8,
-        _cells: &Vec<JswRawCell>,
+        _cells: &[JswRawCell],
     ) -> Result<[u8; ROOM_LAYOUT_SIZE]> {
         // Read conveyor direction, position & length
         // let conveyor_and_ramp = Self::get_conveyor_and_ramp(data, room_no)?;
@@ -146,9 +159,7 @@ impl RawParser for RawJswGame {
 
         Ok(cells)
     }
-}
 
-impl RawJswGame {
     fn get_cell_behaviour(
         cell_no: usize,
         conveyor_direction: ConveyorDirection,

@@ -73,6 +73,39 @@
     {
       "type": "lldb",
       "request": "launch",
+      "name": "jsw_tool (convert, jsw2[bin])",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--manifest-path", "${workspaceFolder}/rust/apps/jsw_tool/Cargo.toml"]
+      },
+      "args": ["convert", "./resources/jsw2/bin/jsw2.bin", "./resources/jsw2/game"],
+      "sourceLanguages": ["rust"]
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "jsw_tool (convert, jsw2[tap])",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--manifest-path", "${workspaceFolder}/rust/apps/jsw_tool/Cargo.toml"]
+      },
+      "args": ["convert", "./resources/jsw2/bin/jsw2.tap", "./resources/jsw2/game"],
+      "sourceLanguages": ["rust"]
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
+      "name": "jsw_tool (convert, jsw2[tzx])",
+      "cwd": "${workspaceFolder}",
+      "cargo": {
+        "args": ["build", "--manifest-path", "${workspaceFolder}/rust/apps/jsw_tool/Cargo.toml"]
+      },
+      "args": ["convert", "./resources/jsw2/bin/jsw2.tzx", "./resources/jsw2/game"],
+      "sourceLanguages": ["rust"]
+    },
+    {
+      "type": "lldb",
+      "request": "launch",
       "name": "Debug Rust (current project)",
       "cargo": {
         "args": ["build", "--manifest-path", "${fileDirname}/../Cargo.toml"]
