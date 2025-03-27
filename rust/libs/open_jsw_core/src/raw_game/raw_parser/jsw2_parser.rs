@@ -191,19 +191,19 @@ impl RawJsw2Game {
             let mut attribute = data.read_u8()?;
 
             let sprite = [
-                data.read_u8()?.reverse_bits(),
-                data.read_u8()?.reverse_bits(),
-                data.read_u8()?.reverse_bits(),
-                data.read_u8()?.reverse_bits(),
-                data.read_u8()?.reverse_bits(),
-                data.read_u8()?.reverse_bits(),
-                data.read_u8()?.reverse_bits(),
-                data.read_u8()?.reverse_bits(),
+                data.read_u8()?,
+                data.read_u8()?,
+                data.read_u8()?,
+                data.read_u8()?,
+                data.read_u8()?,
+                data.read_u8()?,
+                data.read_u8()?,
+                data.read_u8()?,
             ];
 
             let behaviour = Self::get_cell_behaviour(i + 1);
-            if (behaviour == CellBehaviour::Item) {
-                attribute = 0x07 | 0x80; // Bright white
+            if behaviour == CellBehaviour::Item {
+                attribute = 0x87 // Bright white ink, black paper, no flash
             }
 
             let cell = JswRawCell::new(i as u8 + 1, attribute, behaviour, sprite);

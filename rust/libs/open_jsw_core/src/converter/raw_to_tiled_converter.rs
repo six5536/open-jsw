@@ -66,23 +66,9 @@ impl Converter<JswRawGame, MapWithSpritesheet> for RawToTiledConverter {
         let room_layers = self.convert_rooms(&mut context, &mut map, &raw_game.rooms)?;
 
         // Create the spritesheet
-        let cell_spritesheet = self.create_cell_spritesheet(&context)?;
-
-        // Add a dummy tileset
-        let tileset = Tileset::new(
-            "cells".to_string(),
-            "gfx/cells.png".to_string(),
-            // 8 * 16,
-            // 8 * 16,
-            8 * 32,
-            8 * 32,
-            8,
-            8,
-            1,
-        );
+        let cell_spritesheet = self.create_cell_spritesheet(&context, &mut map)?;
 
         map.layers = room_layers;
-        map.tilesets.push(tileset);
 
         Ok(MapWithSpritesheet {
             map,
@@ -244,39 +230,21 @@ impl RawToTiledConverter {
         Ok(room_layer)
     }
 
-    fn create_cell_spritesheet(&self, context: &ConvertContext) -> Result<Image> {
+    fn create_cell_spritesheet(&self, context: &ConvertContext, map: &mut Map) -> Result<Image> {
         let sprite_images: Vec<&Image> = context.get_cell_sprites_vec();
         let spritesheet = create_spritesheet(sprite_images);
 
-        // // Save to png
-        // let mut path = PathBuf::from("tmp");
-        // path.push("spritesheet.png");
-        // image::save_buffer(
-        //     &path,
-        //     &spritesheet.bytes,
-        //     spritesheet.width as u32,
-        //     spritesheet.height as u32,
-        //     image::ColorType::Rgba8,
-        // )
-        // .unwrap();
-
-        // // Hack, write to pngs
-        // for (id, sprite) in context.cell_sprites.sprites.iter() {
-        //     let mut path = PathBuf::from("tmp");
-        //     path.push(format!("sprite_{}.png", id));
-
-        //     // Save to png
-        //     image::save_buffer(
-        //         &path,
-        //         &sprite.bytes,
-        //         sprite.width as u32,
-        //         sprite.height as u32,
-        //         image::ColorType::Rgba8,
-        //     )
-        //     .unwrap();
-        // }
-
-        // TODO build the sprites into a spritesheet
+        // Add the tileset for the spritesheet
+        let tileset = Tileset::new(
+            "cells".to_string(),
+            "gfx/cells.png".to_string(),
+            spritesheet.width as u32,
+            spritesheet.height as u32,
+            8,
+            8,
+            1,
+        );
+        map.tilesets.push(tileset);
 
         Ok(spritesheet)
     }

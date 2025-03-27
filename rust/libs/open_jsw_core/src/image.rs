@@ -16,7 +16,7 @@ pub fn create_image_from_sprite_data(
     let mut colors: Vec<Color> = vec![TRANSPARENT; width * height];
     for (i, row) in data.iter().enumerate() {
         for col in 0..width {
-            let bit = (row >> col) & 1;
+            let bit = (row >> (width - col - 1)) & 1;
             let mut color = bg;
             if bit == 1 {
                 color = fg;

@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use bytebuffer::ByteBuffer;
 
 use super::{RawParser, read_string};
@@ -18,13 +20,22 @@ const ROOM_NAME_LENGTH: usize = 0x20;
 // const ROOM_LAYOUT_BYTE_COUNT: usize = ROOM_LAYOUT_SIZE / 4;
 const CELL_COUNT: usize = 6;
 const CELL_LENGTH: usize = 9;
+const ITEM_ID: u8 = 6;
 const ATTRIBUTE_BUFFER_ADDRESS: u16 = 0x5E00;
+const ITEM_TABLE_OFFSET_1: usize = 0xA400 - ADDR_OFFSET;
+const ITEM_TABLE_OFFSET_2: usize = 0xA500 - ADDR_OFFSET;
+const ITEM_TABLE_LENGTH: usize = 0x100;
 
 pub struct RawJswGame {
     //
 }
 
-pub struct ConveyorAndRamp {
+struct ItemTable {
+    /// Map of room number to list of item positions
+    items: HashMap<u8, Vec<usize>>,
+}
+
+struct ConveyorAndRamp {
     pub conveyor_direction: ConveyorDirection,
     pub conveyor_position: (u16, u16),
     pub conveyor_length: u8,
@@ -35,9 +46,11 @@ pub struct ConveyorAndRamp {
 
 impl RawParser for RawJswGame {
     fn extract_game(game_type: GameType, data: &mut ByteBuffer) -> Result<JswRawGame> {
+        let item_table = Self::extract_item_table(data)?;
+
         let raw_game = JswRawGame {
             game_type,
-            rooms: Self::extract_rooms(data)?,
+            rooms: Self::extract_rooms(data, &item_table)?,
         };
 
         Ok(raw_game)
@@ -45,13 +58,13 @@ impl RawParser for RawJswGame {
 }
 
 impl RawJswGame {
-    fn extract_rooms(data: &mut ByteBuffer) -> Result<Vec<JswRawRoom>> {
+    fn extract_rooms(data: &mut ByteBuffer, item_table: &ItemTable) -> Result<Vec<JswRawRoom>> {
         let mut rooms: Vec<JswRawRoom> = vec![];
 
         // TODO - work out the file format
         let mut room_no: u8 = 0;
         while room_no < ROOM_COUNT - 1 {
-            let room = Self::extract_room(data, room_no)?;
+            let room = Self::extract_room(data, room_no, item_table)?;
 
             rooms.push(room);
             room_no += 1;
@@ -60,7 +73,11 @@ impl RawJswGame {
         Ok(rooms)
     }
 
-    fn extract_room(data: &mut ByteBuffer, room_no: u8) -> Result<JswRawRoom> {
+    fn extract_room(
+        data: &mut ByteBuffer,
+        room_no: u8,
+        item_table: &ItemTable,
+    ) -> Result<JswRawRoom> {
         let room_offset = ROOMS_OFFSET + (room_no as usize * ROOM_SIZE);
         data.set_rpos(room_offset);
 
@@ -73,7 +90,7 @@ impl RawJswGame {
         let cells = Self::extract_cells(data, room_no)?;
 
         // Layout
-        let layout = Self::extract_room_layout(data, room_no, &cells)?;
+        let layout = Self::extract_room_layout(data, room_no, &cells, item_table)?;
 
         let room = JswRawRoom {
             room_no,
@@ -89,6 +106,7 @@ impl RawJswGame {
         data: &mut ByteBuffer,
         room_no: u8,
         _cells: &[JswRawCell],
+        item_table: &ItemTable,
     ) -> Result<[u8; ROOM_LAYOUT_SIZE]> {
         // Read conveyor direction, position & length
         // let conveyor_and_ramp = Self::get_conveyor_and_ramp(data, room_no)?;
@@ -113,6 +131,15 @@ impl RawJswGame {
                 2 => *byte_out = (byte_in >> 2) & 0b00000011,
                 3 => *byte_out = byte_in & 0b00000011,
                 _ => *byte_out = 0,
+            }
+        }
+
+        // Read the items from the item table and add them
+        if let Some(item_positions) = item_table.items.get(&room_no) {
+            for item_pos in item_positions {
+                if *item_pos < ROOM_LAYOUT_SIZE {
+                    layout[*item_pos] = ITEM_ID;
+                }
             }
         }
 
@@ -157,7 +184,54 @@ impl RawJswGame {
             cells.push(cell);
         }
 
+        // Add the item cell
+
+        // Get the backgroud colour for the item cell
+        let air_attribute = cells[0].attribute;
+
+        data.set_rpos(room_offset + 0x0E1);
+        let sprite = [
+            data.read_u8()?,
+            data.read_u8()?,
+            data.read_u8()?,
+            data.read_u8()?,
+            data.read_u8()?,
+            data.read_u8()?,
+            data.read_u8()?,
+            data.read_u8()?,
+        ];
+        let attribute = air_attribute | 0x80 | 0x07; // Bright white ink, air paper, no flash
+        let cell = JswRawCell::new(ITEM_ID, attribute, CellBehaviour::Item, sprite);
+        cells.push(cell);
+
         Ok(cells)
+    }
+
+    fn extract_item_table(data: &mut ByteBuffer) -> Result<ItemTable> {
+        let mut item_table = ItemTable {
+            items: HashMap::new(),
+        };
+
+        data.set_rpos(ITEM_TABLE_OFFSET_1);
+
+        for i in 0..ITEM_TABLE_LENGTH {
+            data.set_rpos(ITEM_TABLE_OFFSET_1 + i);
+            let byte1 = data.read_u8()?;
+
+            data.set_rpos(ITEM_TABLE_OFFSET_2 + i);
+            let byte2 = data.read_u8()?;
+
+            if !(byte1 == 0 && byte2 == 0) {
+                // Set item in the item table
+                let room_no = byte1 & 0x3F;
+                let item_pos: u16 = u16::from_be_bytes([(byte1 >> 7) & 0x01, byte2]);
+
+                let item_positions = item_table.items.entry(room_no).or_default();
+                item_positions.push(item_pos as usize);
+            }
+        }
+
+        Ok(item_table)
     }
 
     fn get_cell_behaviour(

@@ -1,7 +1,7 @@
 // use byteorder::{LittleEndian, ReadBytesExt};
 use std::{fs::File, io::Read, path::PathBuf};
 
-use bytebuffer::{ByteBuffer, Endian::BigEndian, Endian::LittleEndian};
+use bytebuffer::{ByteBuffer, Endian::LittleEndian};
 use macroquad::color::Color;
 use raw_game_identifier::RawGameData;
 use raw_parser::{

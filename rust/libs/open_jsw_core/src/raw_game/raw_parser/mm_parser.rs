@@ -6,6 +6,7 @@ use crate::{
     game::GameType,
     raw_game::{
         CellBehaviour, ConveyorDirection, JswRawCell, JswRawGame, JswRawRoom, ROOM_LAYOUT_SIZE,
+        ROOM_LAYOUT_WIDTH,
     },
 };
 
@@ -16,6 +17,7 @@ const ROOM_COUNT: u8 = 20;
 const ROOM_NAME_LENGTH: usize = 0x20;
 const CELL_COUNT: usize = 8;
 const CELL_LENGTH: usize = 9;
+const ITEM_ID: u8 = 8;
 
 pub struct RawMmGame {
     //
@@ -92,6 +94,32 @@ impl RawMmGame {
             };
         }
 
+        // Read the items and add them
+        data.set_rpos(room_offset + 0x275);
+        loop {
+            // Check for item list terminator
+            let terminator = data.read_u8()?;
+            if terminator == 0x00 {
+                continue;
+            }
+            if terminator == 0xFF {
+                break;
+            }
+
+            let raw_pos = (data.read_u16()? as usize) - 0x5c00;
+            // let row = raw_pos / ROOM_LAYOUT_WIDTH;
+            // let col = raw_pos % ROOM_LAYOUT_WIDTH;
+
+            data.read_u8()?; // Skip the attribute
+            data.read_u8()?; // Skip the item terminator
+
+            if (raw_pos < ROOM_LAYOUT_SIZE) {
+                layout[raw_pos] = ITEM_ID;
+            } else {
+                println!("Item out of bounds: {}", raw_pos);
+            }
+        }
+
         Ok(layout)
     }
 
@@ -132,6 +160,22 @@ impl RawMmGame {
             let cell = JswRawCell::new(i as u8, attribute, behaviour, sprite);
             cells.push(cell);
         }
+
+        // Add the item cell
+        data.set_rpos(room_offset + 0x2B4);
+        let sprite = [
+            data.read_u8()?,
+            data.read_u8()?,
+            data.read_u8()?,
+            data.read_u8()?,
+            data.read_u8()?,
+            data.read_u8()?,
+            data.read_u8()?,
+            data.read_u8()?,
+        ];
+        let attribute = 0x87; // Bright white ink, black paper, no flash
+        let cell = JswRawCell::new(ITEM_ID, attribute, CellBehaviour::Item, sprite);
+        cells.push(cell);
 
         Ok(cells)
     }

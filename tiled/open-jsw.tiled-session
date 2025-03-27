@@ -29,6 +29,17 @@
         "/Users/rich/dev/six5536/git/open-jsw/resources/jsw/game/map.json#cells": {
             "scaleInDock": 1
         },
+        "/Users/rich/dev/six5536/git/open-jsw/resources/jsw2/game/map.json": {
+            "scale": 4.3677734374999995,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 121.57223986048385,
+                "y": 88.94692125385684
+            }
+        },
+        "/Users/rich/dev/six5536/git/open-jsw/resources/jsw2/game/map.json#cells": {
+            "scaleInDock": 1
+        },
         "/Users/rich/dev/six5536/git/open-jsw/resources/mm/game/map.json": {
             "scale": 3.5328125,
             "selectedLayer": 3,
